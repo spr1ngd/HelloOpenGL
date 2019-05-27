@@ -1,0 +1,3 @@
+﻿  HelloOpenGL.cpp
+D:\Project Files\Unity Projects\springdong\HelloOpenGL\HelloOpenGL\HelloOpenGL.cpp(67,30): warning C4305:  “参数”: 从“double”到“GLclampf”截断
+  HelloOpenGL.vcxproj -> D:\Project Files\Unity Projects\springdong\HelloOpenGL\HelloOpenGL\Debug\HelloOpenGL.exe
