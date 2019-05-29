@@ -64,6 +64,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	wglMakeCurrent(dc, rc);
 
 	//opengl init
+	glMatrixMode(GL_PROJECTION);
+	gluPerspective(50,800.0f/600.0f,0.1f,1000.0f);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
 	glClearColor(0.1,0.4,0.6,1.0); // set clear color for background
 
 	if (!hWnd)
@@ -73,6 +78,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd); 
+	glEnable(GL_CULL_FACE);  // ccw
+	/*glPolygonMode(GL_FRONT,GL_POINT);
+	glEnable(GL_POINT_SMOOTH);
+	glEnable(GL_BLEND);*/
+	//glFrontFace(GL_CCW);
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_HELLOOPENGL));
 
@@ -87,7 +97,63 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             DispatchMessage(&msg);
         } 
 		// draw scene
+		glLoadIdentity(); // 重置为单位矩阵
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		glScalef(1.0f, 1.0f,1.0f);
+		glRotatef(30.0f,0.0f,0.0f,1.0f);
+		glTranslatef(5.0f,0.0f,0.0f);
+
+		glColor4ub(255,255,255,255); // set current color : white
+
+		//glPointSize(10.0f);
+		//glBegin(GL_POINTS); // start to draw something
+		//glVertex3f(0.0f,0.0f,-0.5f);
+
+		glPointSize(10.0f);
+		glLineWidth(2.0f);
+
+		// line type
+		//glBegin(GL_LINES);
+		//glBegin(GL_LINE_LOOP);
+		//glBegin(GL_LINE_STRIP);
+
+		// triangles front face : ccw counter clock wise
+		glBegin(GL_TRIANGLES); 
+		//glBegin(GL_TRIANGLE_STRIP); // 奇数点 n n+1 n+2 // 偶数点 n+1 n n+2
+		//glBegin(GL_TRIANGLE_FAN);
+		
+		/*glColor4ub(255, 0, 0, 255); 
+		glVertex3f(0.0f,0.0f,-15.0f);
+		glColor4ub(0, 255, 0, 255);
+		glVertex3f(5.0f, 0.0f, -15.0f);
+		glColor4ub(0, 0, 255, 255);
+		glVertex3f(0.0f, 5.0f, -15.0f);
+		glColor4ub(255, 0, 0, 255);
+		glVertex3f(-5.0f, 0.0f, -15.0f);
+		glColor4ub(0, 255, 0, 255);
+		glVertex3f(0.0f, 10.0f, -15.0f); */
+		//glColor4ub(0, 0, 255, 255);
+		//glVertex3f(5.0f, 5.0f, -15.0f);
+
+		// quad
+		//glBegin(GL_QUADS);
+		//glBegin(GL_QUAD_STRIP); // n/2 -1 个四边形 // 2n-1 2n 2n+2 2n+1
+
+		// polygon
+		//glBegin(GL_POLYGON);
+		glColor4ub(255, 255, 0, 255);
+		glVertex3f(4.0f, 4.0f, -10.0f);
+		glVertex3f(-4.0f, 4.0f, -10.0f);
+		glVertex3f(-4.0f, -4.0f, -10.0f);
+		/*glColor4ub(255, 255, 255, 255);
+		glVertex3f(4.0f, 4.0f,-10.0f);
+		glVertex3f(-4.0f, 4.0f, -10.0f);*/
+	/*	glVertex3f(-4.0f, -4.0f, -10.0f);
+		glVertex3f(4.0f, -4.0f, -10.0f);*/
+
+
+		glEnd();// draw end
 
 		// present scene
 		SwapBuffers(dc);
