@@ -7,6 +7,7 @@
 #include <gl/GLU.h>
 #include "texture.h"
 #include "util.h"
+#include "objloader.h"
 #pragma comment(lib,"opengl32.lib")
 #pragma comment(lib,"glu32.lib")
 
@@ -71,10 +72,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	char* str = (char*)LoadFileContent("text.txt");
-	printf("%s\n",str);
-	//Texture texture;
-	//texture.Init("test.bmp"); // init opengl texture
+	/*char* str = (char*)LoadFileContent("text.txt");
+	printf("%s\n", str);*/
+	Texture texture;
+	texture.Init("res/test.bmp"); // init opengl texture
+
+	ObjLoader objLoader;
+	objLoader.init("res/Quad.obj");
 
 	glClearColor(0.1f,0.4f,0.6f,1.0f); // set clear color for background
 
@@ -128,8 +132,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// draw scene
 		//glLoadIdentity(); // 重置为单位矩阵
 		glClear(GL_COLOR_BUFFER_BIT);
-
 		glPushMatrix();
+
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, texture.mTextureID);
+		
 
 		/*glScalef(1.0f, 1.0f,1.0f);
 		glRotatef(30.0f,0.0f,0.0f,1.0f);
@@ -150,9 +157,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//glBegin(GL_LINE_STRIP);
 
 		// triangles front face : ccw counter clock wise
-		glBegin(GL_TRIANGLES); 
+		//glBegin(GL_TRIANGLES); 
 		//glBegin(GL_TRIANGLE_STRIP); // 奇数点 n n+1 n+2 // 偶数点 n+1 n n+2
-		//glBegin(GL_TRIANGLE_FAN);
+		glBegin(GL_TRIANGLE_FAN);
 		
 		/*glColor4ub(255, 0, 0, 255); 
 		glVertex3f(0.0f,0.0f,-15.0f);
@@ -182,18 +189,28 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		glVertex3f(-4.0f, 4.0f, -10.0f);*/
 	/*	glVertex3f(-4.0f, -4.0f, -10.0f);
 		glVertex3f(4.0f, -4.0f, -10.0f);*/
+
+		float width = 5.0f;
+
+		glColor4ub(255, 0, 0, 255);
+		glTexCoord2f(0.0f, 2.0f);
+		glNormal3f(0.0f, 1.0f, 0.0f);
+		glVertex3f(-width, -1.0f, -width - 10);
 		
 		glColor4ub(255,0,0,255);
+		glTexCoord2f(0.0f, 0.0f);
 		glNormal3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(0.0f,-2.0f,-20.0f);
-		glColor4ub(0, 255, 0, 255);
-		glNormal3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(-2.0f, -2.0f, -5.0f);
-		glColor4ub(0, 0, 255, 255);
-		glNormal3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(2.0f,-2.0f,-5.0f);
-	
+		glVertex3f(-width,-1.0f, width - 10);
 
+		glColor4ub(0, 255, 0, 255);
+		glTexCoord2f(2.0f, 0.0f);
+		glNormal3f(0.0f, 1.0f, 0.0f);
+		glVertex3f(width, -1.0f, width - 10);
+
+		glColor4ub(0, 0, 255, 255);
+		glTexCoord2f(2.0f, 2.0f);
+		glNormal3f(0.0f, 1.0f, 0.0f);
+		glVertex3f(width, -1.0f, -width - 10.0f);
 
 		glEnd();// draw end
 		glPopMatrix();

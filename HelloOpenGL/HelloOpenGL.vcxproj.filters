@@ -33,6 +33,12 @@
     <ClInclude Include="texture.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="objloader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="vertexData.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="util.cpp">
@@ -42,6 +48,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="objloader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="vertexData.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
