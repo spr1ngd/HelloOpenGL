@@ -108,10 +108,34 @@ void ObjLoader::init(const char* objModel)
 			} 
 		}
 	}
+	mIndexCount = (int)indexes.size();
+	mIndices = new int[mIndexCount];
+	for (int i = 0; i < mIndexCount; ++i)
+	{
+		mIndices[i] = indexes[i];
+	}
+	int vertexCount = (int)vertexes.size();
+	mVertexes = new vertexData[vertexCount];
+	for (int i = 0; i < vertexCount;i++ )
+	{
+		memcpy(mVertexes[i].position, positions[vertexes[i].posIndex - 1].v, sizeof(float) * 3);
+		memcpy(mVertexes[i].texcoord, texcoords[vertexes[i].texcoordIndex - 1].v, sizeof(float) * 2);
+		memcpy(mVertexes[i].normal, normals[vertexes[i].normalIndex - 1].v, sizeof(float) * 3);
+	}
 	delete fileContent;
 }
 
 void ObjLoader::Draw()
 {
-
+	glPolygonMode(GL_FRONT, GL_LINE);
+	glPushMatrix();
+	glTranslatef(0, 0, -2.0f);
+	glBegin(GL_TRIANGLES);
+	for (int i = 0; i < mIndexCount; ++i)
+	{
+		glVertex3f(mVertexes[mIndices[i]].position[0],mVertexes[mIndices[i]].position[1], mVertexes[mIndices[i]].position[2]);
+		//glVertex3fv(mVertexes[mIndices[i]].position);
+	}
+	glEnd();
+	glPopMatrix();
 }

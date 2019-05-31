@@ -1,2 +1,4 @@
-﻿  texture.cpp
+﻿  main.cpp
+  objloader.cpp
+  正在生成代码...
   HelloOpenGL.vcxproj -> D:\Project Files\Unity Projects\springdong\HelloOpenGL\HelloOpenGL\Debug\HelloOpenGL.exe

@@ -79,6 +79,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	ObjLoader objLoader;
 	objLoader.init("res/Quad.obj");
+	
 
 	glClearColor(0.1f,0.4f,0.6f,1.0f); // set clear color for background
 
@@ -92,7 +93,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	glEnable(GL_CULL_FACE);  // ccw
 
 	// init light
-	float blackColor[] = {1.0f,1.0f,0.0f,1.0f};
+	float blackColor[] = {1.0f,1.0f,1.0f,1.0f};
 	float lightPos[] = {0.0f,1.0f,0.0f,0.0f}; // todo : qi ci zuobiao 
 	glLightfv(GL_LIGHT0,GL_AMBIENT, blackColor);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, blackColor);
@@ -100,7 +101,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	glLightfv(GL_LIGHT0,GL_POSITION, lightPos); // direction light /  spot light /  point light
 
 	// material 
-	float blackMat[] = {1.0f,1.0f,0.0f,1.0f};
+	float blackMat[] = {1.0f,1.0f,1.0f,1.0f};
 	float ambient[] = {0.2f,0.2f,0.2f,1.0f};
 	float diffuse[] = {1.0f,0.0f,0.0f,1.0f};
 	
@@ -133,9 +134,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//glLoadIdentity(); // 重置为单位矩阵
 		glClear(GL_COLOR_BUFFER_BIT);
 		glPushMatrix();
+		objLoader.Draw();
 
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, texture.mTextureID);
+		// bind texture for mesh
+		//glEnable(GL_TEXTURE_2D);
+		//glBindTexture(GL_TEXTURE_2D, texture.mTextureID);
 		
 
 		/*glScalef(1.0f, 1.0f,1.0f);
@@ -159,7 +162,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// triangles front face : ccw counter clock wise
 		//glBegin(GL_TRIANGLES); 
 		//glBegin(GL_TRIANGLE_STRIP); // 奇数点 n n+1 n+2 // 偶数点 n+1 n n+2
-		glBegin(GL_TRIANGLE_FAN);
+		
 		
 		/*glColor4ub(255, 0, 0, 255); 
 		glVertex3f(0.0f,0.0f,-15.0f);
@@ -190,6 +193,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	/*	glVertex3f(-4.0f, -4.0f, -10.0f);
 		glVertex3f(4.0f, -4.0f, -10.0f);*/
 
+		glBegin(GL_TRIANGLE_FAN);
 		float width = 5.0f;
 
 		glColor4ub(255, 0, 0, 255);
