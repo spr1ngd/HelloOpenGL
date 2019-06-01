@@ -4,7 +4,7 @@
 #include <sstream>
 #include <vector>
 
-void ObjLoader::init(const char* objModel) 
+void ObjLoader::Init(const char* objModel) 
 {
 	struct FloatData
 	{
@@ -134,10 +134,9 @@ void ObjLoader::Draw()
 	glBegin(GL_TRIANGLES);
 	for (int i = 0; i < mIndexCount; ++i)
 	{
-		//glVertex3f(mVertexes[mIndices[i]].position[0],mVertexes[mIndices[i]].position[1], mVertexes[mIndices[i]].position[2]);
-		glVertex3fv(mVertexes[mIndices[i]].position);
-		glNormal3fv(mVertexes[mIndices[i]].normal);
 		glTexCoord2fv(mVertexes[mIndices[i]].texcoord);
+		glNormal3fv(mVertexes[mIndices[i]].normal);
+		glVertex3fv(mVertexes[mIndices[i]].position);
 	}
 	glEnd();
 	glPopMatrix();

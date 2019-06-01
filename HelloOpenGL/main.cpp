@@ -90,8 +90,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	texture.Init("res/niutou.bmp"); // init opengl texture
 
 	ObjLoader objLoader;
-	objLoader.init("res/niutou.obj");
+	objLoader.Init("res/niutou.obj");
 	
+	for (int i = 0; i < 5; i++) 
+	{
+		printf("i++ %d\n" ,i);
+	}
+	for (int i = 0; i < 5; ++i)
+	{
+		printf("++i %d\n", i);
+	}
 
 	glClearColor(0.1f,0.4f,0.6f,1.0f); // set clear color for background
 
