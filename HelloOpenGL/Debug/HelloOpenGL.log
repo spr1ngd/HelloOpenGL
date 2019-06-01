@@ -1,5 +1,4 @@
-﻿  objloader.cpp
-D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\objloader.cpp(133,27): warning C4305:  “参数”: 从“double”到“GLfloat”截断
+﻿  main.cpp
   LINK : 没有找到 D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\Debug\HelloOpenGL.exe 或上一个增量链接没有生成它；正在执行完全链接
   HelloOpenGL.vcxproj -> D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\Debug\HelloOpenGL.exe
   Microsoft (R) COFF/PE Editor Version 14.21.27702.2

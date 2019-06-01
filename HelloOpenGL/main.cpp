@@ -87,20 +87,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	/*char* str = (char*)LoadFileContent("text.txt");
 	printf("%s\n", str);*/
 	Texture texture;
-	texture.Init("res/niutou.bmp"); // init opengl texture
+	texture.Init("res/earth.bmp"); // init opengl texture
 
 	ObjLoader objLoader;
-	objLoader.Init("res/niutou.obj");
-	
-	for (int i = 0; i < 5; i++) 
-	{
-		printf("i++ %d\n" ,i);
-	}
-	for (int i = 0; i < 5; ++i)
-	{
-		printf("++i %d\n", i);
-	}
-
+	objLoader.Init("res/Sphere.obj"); 
 	glClearColor(0.1f,0.4f,0.6f,1.0f); // set clear color for background
 
 	if (!hWnd)
@@ -126,7 +116,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	float blackMat[] = {0.0f,0.0f,0.0f,1.0f};
 	float ambient[] = {0.1f,0.1f,0.1f,1.0f};
 	float diffuse[] = {0.4f,0.4f,0.4f,1.0f};
-	float specular[] = {0.0f,0.5f,0.5f,1.0f};
+	float specular[] = {0.9f,0.9f,0.9f,1.0f};
 	
 	glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
@@ -143,16 +133,26 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_HELLOOPENGL));
 
-    MSG msg;
-
+    MSG msg; 
+	 
     // 主消息循环:
-    while (GetMessage(&msg, nullptr, 0, 0))
+    while (/*GetMessage(&msg, nullptr, 0, 0)*/true)
     {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+        /*if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
-        } 
+        } */
+
+		if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE)) 
+		{
+			if (msg.message == WM_QUIT)
+			{
+				break;
+			}
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
 		// draw scene
 		//glLoadIdentity(); // 重置为单位矩阵
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);

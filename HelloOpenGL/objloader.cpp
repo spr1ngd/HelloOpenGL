@@ -121,7 +121,7 @@ void ObjLoader::Init(const char* objModel)
 void ObjLoader::Draw()
 {
 	static float angle = 0.0f;
-	angle += 0.2f;
+	angle += 0.2f; 
 	if (angle > 360.0f)
 	{
 		angle = 0.0f;
@@ -130,7 +130,7 @@ void ObjLoader::Draw()
 	glPushMatrix();
 	glTranslatef(0, 0, -2.0f);
 	glRotatef(angle,0.0f,1.0f,0.0f);
-	glScalef(0.01,0.01f,0.01f);
+	//glScalef(0.01,0.01f,0.01f);
 	glBegin(GL_TRIANGLES);
 	for (int i = 0; i < mIndexCount; ++i)
 	{
