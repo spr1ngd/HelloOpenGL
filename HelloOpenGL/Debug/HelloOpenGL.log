@@ -1,5 +1,9 @@
-﻿  main.cpp
+﻿  Skybox.cpp
   LINK : 没有找到 D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\Debug\HelloOpenGL.exe 或上一个增量链接没有生成它；正在执行完全链接
+soil.lib(image_DXT.obj) : warning LNK4099: 未找到 PDB“”(使用“soil.lib(image_DXT.obj)”或在“”中寻找)；正在链接对象，如同没有调试信息一样
+soil.lib(image_helper.obj) : warning LNK4099: 未找到 PDB“ꌁ”(使用“soil.lib(image_helper.obj)”或在“ꌁ”中寻找)；正在链接对象，如同没有调试信息一样
+soil.lib(SOIL.obj) : warning LNK4099: 未找到 PDB“ꌁ”(使用“soil.lib(SOIL.obj)”或在“ꌁ”中寻找)；正在链接对象，如同没有调试信息一样
+soil.lib(stb_image_aug.obj) : warning LNK4099: 未找到 PDB“ꌁ”(使用“soil.lib(stb_image_aug.obj)”或在“ꌁ”中寻找)；正在链接对象，如同没有调试信息一样
   HelloOpenGL.vcxproj -> D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\Debug\HelloOpenGL.exe
   Microsoft (R) COFF/PE Editor Version 14.21.27702.2
   Copyright (C) Microsoft Corporation.  All rights reserved.

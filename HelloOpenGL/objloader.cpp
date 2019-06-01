@@ -126,9 +126,11 @@ void ObjLoader::Draw()
 	{
 		angle = 0.0f;
 	}
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
 	//glPolygonMode(GL_FRONT, GL_LINE);
 	glPushMatrix();
-	glTranslatef(0, 0, -2.0f);
+	glTranslatef(0, 0, -5.0f);
 	glRotatef(angle,0.0f,1.0f,0.0f);
 	//glScalef(0.01,0.01f,0.01f);
 	glBegin(GL_TRIANGLES);

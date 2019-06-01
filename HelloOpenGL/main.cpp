@@ -8,8 +8,16 @@
 #include "texture.h"
 #include "util.h"
 #include "objloader.h"
+#include "Camera.h" 
+#include <mmsystem.h>
+#include "skybox.h"
+
+Camera camera;
+Skybox skybox;
+  
 #pragma comment(lib,"opengl32.lib")
 #pragma comment(lib,"glu32.lib")
+#pragma comment(lib,"winmm.lib")
 
 #define MAX_LOADSTRING 100
 
@@ -86,11 +94,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	/*char* str = (char*)LoadFileContent("text.txt");
 	printf("%s\n", str);*/
-	Texture texture;
-	texture.Init("res/earth.bmp"); // init opengl texture
+	Texture* texture = Texture::LoadTexture("res/earth.bmp"); 
 
 	ObjLoader objLoader;
 	objLoader.Init("res/Sphere.obj"); 
+
+	skybox.Init("res/skybox");
+
 	glClearColor(0.1f,0.4f,0.6f,1.0f); // set clear color for background
 
 	if (!hWnd)
@@ -134,6 +144,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_HELLOOPENGL));
 
     MSG msg; 
+	static float sTimeSinceStartUp = timeGetTime() / 1000.0f;
 	 
     // 主消息循环:
     while (/*GetMessage(&msg, nullptr, 0, 0)*/true)
@@ -154,102 +165,27 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 		// draw scene
-		//glLoadIdentity(); // 重置为单位矩阵
-		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-		glPushMatrix();
+		glLoadIdentity(); // 重置为单位矩阵
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		float currentTime = timeGetTime() / 1000.0f;
+		float timeElapse = currentTime - sTimeSinceStartUp; 
+		sTimeSinceStartUp = currentTime;
+		//printf("tiem elapse since last frame : %f\n", timeElapse);
+		// set up camera
+		camera.Update(timeElapse); // 固定为60FPS
+		skybox.Draw(camera.mPos);
+			
+		
+		//glPushMatrix();
 		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D,texture.mTextureID);
-		objLoader.Draw();
+		glBindTexture(GL_TEXTURE_2D,texture->mTextureID);
+		objLoader.Draw(); 
 
-		// bind texture for mesh
-	/*	glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, texture.mTextureID);*/
-		
-
-		/*glScalef(1.0f, 1.0f,1.0f);
-		glRotatef(30.0f,0.0f,0.0f,1.0f);
-		glTranslatef(5.0f,0.0f,0.0f);*/
-
-		//glColor4ub(255,255,255,255); // set current color : white
-
-		//glPointSize(10.0f);
-		//glBegin(GL_POINTS); // start to draw something
-		//glVertex3f(0.0f,0.0f,-0.5f);
-
-		/*glPointSize(10.0f);
-		glLineWidth(2.0f);*/
-
-		// line type
-		//glBegin(GL_LINES);
-		//glBegin(GL_LINE_LOOP);
-		//glBegin(GL_LINE_STRIP);
-
-		// triangles front face : ccw counter clock wise
-		//glBegin(GL_TRIANGLES); 
-		//glBegin(GL_TRIANGLE_STRIP); // 奇数点 n n+1 n+2 // 偶数点 n+1 n n+2
-		
-		
-		/*glColor4ub(255, 0, 0, 255); 
-		glVertex3f(0.0f,0.0f,-15.0f);
-		glColor4ub(0, 255, 0, 255);
-		glVertex3f(5.0f, 0.0f, -15.0f);
-		glColor4ub(0, 0, 255, 255);
-		glVertex3f(0.0f, 5.0f, -15.0f);
-		glColor4ub(255, 0, 0, 255);
-		glVertex3f(-5.0f, 0.0f, -15.0f);
-		glColor4ub(0, 255, 0, 255);
-		glVertex3f(0.0f, 10.0f, -15.0f); */
-		//glColor4ub(0, 0, 255, 255);
-		//glVertex3f(5.0f, 5.0f, -15.0f);
-
-		// quad
-		//glBegin(GL_QUADS);
-		//glBegin(GL_QUAD_STRIP); // n/2 -1 个四边形 // 2n-1 2n 2n+2 2n+1
-
-		// polygon
-		//glBegin(GL_POLYGON);
-		/*glColor4ub(255, 255, 0, 255);
-		glVertex3f(4.0f, 4.0f, -10.0f);
-		glVertex3f(-4.0f, 4.0f, -10.0f);
-		glVertex3f(-4.0f, -4.0f, -10.0f);*/
-		/*glColor4ub(255, 255, 255, 255);
-		glVertex3f(4.0f, 4.0f,-10.0f);
-		glVertex3f(-4.0f, 4.0f, -10.0f);*/
-	/*	glVertex3f(-4.0f, -4.0f, -10.0f);
-		glVertex3f(4.0f, -4.0f, -10.0f);*/
-
-		//glBegin(GL_TRIANGLE_FAN);
-		//float width = 5.0f;
-
-		////glColor4ub(128, 128, 128, 255); 
-		//glTexCoord2f(0.0f, 2.0f);
-		//glNormal3f(0.0f, 1.0f, 0.0f);
-		//glVertex3f(-width, -1.0f, -width - 10);
-		//
-		////glColor4ub(255, 255, 255, 255);		
-		//glTexCoord2f(0.0f, 0.0f);
-		//glNormal3f(0.0f, 1.0f, 0.0f);
-		//glVertex3f(-width,-1.0f, width - 10);
-
-		////glColor4ub(128, 128, 128, 255);
-		//glTexCoord2f(2.0f, 0.0f);
-		//glNormal3f(0.0f, 1.0f, 0.0f);
-		//glVertex3f(width, -1.0f, width - 10);
-
-		////glColor4ub(0, 0, 0, 255);
-		//glTexCoord2f(2.0f, 2.0f);
-		//glNormal3f(0.0f, 1.0f, 0.0f);
-		//glVertex3f(width, -1.0f, -width - 10.0f);
-
-		//glEnd();// draw end
-		//glPopMatrix();
-		// present scene
 		SwapBuffers(dc);
     }
 
     return (int) msg.wParam;
 }
-
 
 
 //
@@ -276,22 +212,95 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
     return RegisterClassExW(&wcex);
-} 
+}  
 
-//
-//  函数: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  目标: 处理主窗口的消息。
-//
-//  WM_COMMAND  - 处理应用程序菜单
-//  WM_PAINT    - 绘制主窗口
-//  WM_DESTROY  - 发送退出消息并返回
-//
-//
+POINT originPos;
+bool bRotateView = false;
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+	case WM_KEYDOWN:
+		switch (wParam)
+		{
+			case  'A':
+				camera.isMoveLeft = true;
+				break;
+			case  'D':
+				camera.isMoveRight = true;
+				break;
+			case 'W':
+				camera.isMoveForward = true;
+				break;
+			case 'S':
+				camera.isMoveBack = true;
+				break;
+			case 'Q':
+				camera.isLeftRotate = true;
+				break;
+			case 'E':
+				camera.isRightRotate = true;
+				break;
+			default:
+				break;
+		}
+		break;
+	case WM_KEYUP:
+		switch (wParam)
+		{
+		case  'A':
+			camera.isMoveLeft = false;
+			break;
+		case  'D':
+			camera.isMoveRight = false;
+			break;
+		case 'W':
+			camera.isMoveForward = false;
+			break;
+		case 'S':
+			camera.isMoveBack = false;
+			break;
+		case 'Q':
+			camera.isLeftRotate = false;
+			break;
+		case 'E':
+			camera.isRightRotate = false;
+			break;
+		default:
+			break;
+		}
+		break;
+	case WM_MOUSEMOVE:
+		if (bRotateView) 
+		{
+			POINT mousePos;
+			mousePos.x = LOWORD(lParam);
+			mousePos.y = HIWORD(lParam);
+			ClientToScreen(hWnd, &mousePos);
+			float offsetX = mousePos.x - originPos.x;
+			float offsetY = mousePos.y - originPos.y;
+			float angleByUp = -(float)offsetX / 1000.0f;
+			float angleByRight = -(float)offsetY / 1000.0f;
+			camera.Pitch(angleByRight);
+			camera.Yaw(angleByUp);
+			SetCursorPos(originPos.x,originPos.y);
+		}
+		break;
+	case WM_RBUTTONDOWN:
+		originPos.x = LOWORD(lParam);
+		originPos.y = HIWORD(lParam);
+		ClientToScreen(hWnd, &originPos);
+		SetCapture(hWnd);
+		ShowCursor(false);
+		bRotateView = true;
+		break;
+	case WM_RBUTTONUP:
+		bRotateView = false;
+		SetCursorPos(originPos.x,originPos.y);
+		ReleaseCapture();
+		ShowCursor(true);		
+		break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
