@@ -43,9 +43,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     {
         return FALSE;
     }*/
+	RECT rect;
+	rect.left = 0;
+	rect.right = 800;
+	rect.top = 0;
+	rect.bottom = 600;
+	AdjustWindowRect(&rect,WS_OVERLAPPEDWINDOW,NULL);
+
 
 	HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+		100, 100, rect.right-rect.left, rect.bottom-rect.top, nullptr, nullptr, hInstance, nullptr);
+
+	GetClientRect(hWnd, &rect);
+	int viewportWidth = rect.right - rect.left;
+	int viewportHeight = rect.bottom - rect.top;
 
 	// creata opengl render context
 	HDC dc = GetDC(hWnd);
@@ -65,20 +76,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	HGLRC rc = wglCreateContext(dc);
 	wglMakeCurrent(dc, rc);
+	glViewport(0,0,viewportWidth,viewportHeight);
 
 	//opengl init
 	glMatrixMode(GL_PROJECTION);
-	gluPerspective(60,800.0f/600.0f,0.1f,1000.0f);
+	gluPerspective(60,(float)viewportWidth/ (float)viewportHeight,0.1f,1000.0f);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
 	/*char* str = (char*)LoadFileContent("text.txt");
 	printf("%s\n", str);*/
 	Texture texture;
-	texture.Init("res/test.bmp"); // init opengl texture
+	texture.Init("res/niutou.bmp"); // init opengl texture
 
 	ObjLoader objLoader;
-	objLoader.init("res/Quad.obj");
+	objLoader.init("res/niutou.obj");
 	
 
 	glClearColor(0.1f,0.4f,0.6f,1.0f); // set clear color for background
@@ -91,27 +103,30 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd); 
 	glEnable(GL_CULL_FACE);  // ccw
+	glEnable(GL_DEPTH_TEST);
 
 	// init light
-	float blackColor[] = {1.0f,1.0f,1.0f,1.0f};
+	float whiteColor[] = {1.0f,1.0f,1.0f,1.0f};
+	float grayColor[] = {0.2f,0.2f, 0.2f, 1.0f};
 	float lightPos[] = {0.0f,1.0f,0.0f,0.0f}; // todo : qi ci zuobiao 
-	glLightfv(GL_LIGHT0,GL_AMBIENT, blackColor);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, blackColor);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, blackColor);
+	glLightfv(GL_LIGHT0,GL_AMBIENT, whiteColor);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, whiteColor);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, whiteColor);
 	glLightfv(GL_LIGHT0,GL_POSITION, lightPos); // direction light /  spot light /  point light
 
 	// material 
-	float blackMat[] = {1.0f,1.0f,1.0f,1.0f};
-	float ambient[] = {0.2f,0.2f,0.2f,1.0f};
-	float diffuse[] = {1.0f,0.0f,0.0f,1.0f};
+	float blackMat[] = {0.0f,0.0f,0.0f,1.0f};
+	float ambient[] = {0.1f,0.1f,0.1f,1.0f};
+	float diffuse[] = {0.4f,0.4f,0.4f,1.0f};
+	float specular[] = {0.0f,0.5f,0.5f,1.0f};
 	
 	glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, blackMat);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+	glMaterialf(GL_FRONT,GL_SHININESS,30.0f);
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-
 
 	/*glPolygonMode(GL_FRONT,GL_POINT);
 	glEnable(GL_POINT_SMOOTH);
@@ -132,20 +147,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         } 
 		// draw scene
 		//glLoadIdentity(); // 重置为单位矩阵
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 		glPushMatrix();
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D,texture.mTextureID);
 		objLoader.Draw();
 
 		// bind texture for mesh
-		//glEnable(GL_TEXTURE_2D);
-		//glBindTexture(GL_TEXTURE_2D, texture.mTextureID);
+	/*	glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, texture.mTextureID);*/
 		
 
 		/*glScalef(1.0f, 1.0f,1.0f);
 		glRotatef(30.0f,0.0f,0.0f,1.0f);
 		glTranslatef(5.0f,0.0f,0.0f);*/
 
-		glColor4ub(255,255,255,255); // set current color : white
+		//glColor4ub(255,255,255,255); // set current color : white
 
 		//glPointSize(10.0f);
 		//glBegin(GL_POINTS); // start to draw something
@@ -193,31 +210,31 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	/*	glVertex3f(-4.0f, -4.0f, -10.0f);
 		glVertex3f(4.0f, -4.0f, -10.0f);*/
 
-		glBegin(GL_TRIANGLE_FAN);
-		float width = 5.0f;
+		//glBegin(GL_TRIANGLE_FAN);
+		//float width = 5.0f;
 
-		glColor4ub(255, 0, 0, 255);
-		glTexCoord2f(0.0f, 2.0f);
-		glNormal3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(-width, -1.0f, -width - 10);
-		
-		glColor4ub(255,0,0,255);
-		glTexCoord2f(0.0f, 0.0f);
-		glNormal3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(-width,-1.0f, width - 10);
+		////glColor4ub(128, 128, 128, 255); 
+		//glTexCoord2f(0.0f, 2.0f);
+		//glNormal3f(0.0f, 1.0f, 0.0f);
+		//glVertex3f(-width, -1.0f, -width - 10);
+		//
+		////glColor4ub(255, 255, 255, 255);		
+		//glTexCoord2f(0.0f, 0.0f);
+		//glNormal3f(0.0f, 1.0f, 0.0f);
+		//glVertex3f(-width,-1.0f, width - 10);
 
-		glColor4ub(0, 255, 0, 255);
-		glTexCoord2f(2.0f, 0.0f);
-		glNormal3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(width, -1.0f, width - 10);
+		////glColor4ub(128, 128, 128, 255);
+		//glTexCoord2f(2.0f, 0.0f);
+		//glNormal3f(0.0f, 1.0f, 0.0f);
+		//glVertex3f(width, -1.0f, width - 10);
 
-		glColor4ub(0, 0, 255, 255);
-		glTexCoord2f(2.0f, 2.0f);
-		glNormal3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(width, -1.0f, -width - 10.0f);
+		////glColor4ub(0, 0, 0, 255);
+		//glTexCoord2f(2.0f, 2.0f);
+		//glNormal3f(0.0f, 1.0f, 0.0f);
+		//glVertex3f(width, -1.0f, -width - 10.0f);
 
-		glEnd();// draw end
-		glPopMatrix();
+		//glEnd();// draw end
+		//glPopMatrix();
 		// present scene
 		SwapBuffers(dc);
     }
