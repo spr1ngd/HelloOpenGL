@@ -98,7 +98,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>editbin /subsystem:console $(OutDir)$(ProjectName).exe</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -159,9 +160,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="DisplayList.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="HelloOpenGL.h" />
+    <ClInclude Include="ImageSprite.h" />
     <ClInclude Include="objloader.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Skybox.h" />
@@ -172,7 +175,9 @@
     <ClInclude Include="vertexData.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DisplayList.cpp" />
+    <ClCompile Include="ImageSprite.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="objloader.cpp" />
     <ClCompile Include="Skybox.cpp" />

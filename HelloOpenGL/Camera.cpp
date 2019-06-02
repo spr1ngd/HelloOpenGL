@@ -12,7 +12,9 @@ isMoveRight(false),
 isMoveForward(false),
 isMoveBack(false),
 isLeftRotate(false),
-isRightRotate(false)
+isRightRotate(false),
+mViewportHeight(0),
+mViewportWidth(0)
 {
 
 }
@@ -52,7 +54,7 @@ void Camera::Yaw( float angle )
 }
 
 void Camera::Update(float deltaTime)
-{ 
+{  
 	float moveSpeed = 10.0f; 
 	float rotateSpeed = 5.0f;
 	 
@@ -96,4 +98,22 @@ void Camera::Update(float deltaTime)
 	gluLookAt(mPos.x, mPos.y, mPos.z,
 		mViewCenter.x, mViewCenter.y, mViewCenter.z,
 		mUp.x, mUp.y, mUp.z);
+}
+
+void Camera::SwitchTo3D() 
+{
+	isPerspective = true;
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(60, mViewportWidth / mViewportHeight, 0.1f, 1000.0f);
+	glMatrixMode(GL_MODELVIEW);
+}
+
+void Camera::SwitchTo2D() 
+{
+	isPerspective = false;
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(-mViewportWidth/2.0f,mViewportWidth/2.0f,-mViewportHeight/2.0f,mViewportHeight/2.0f);
+	glMatrixMode(GL_MODELVIEW);
 }

@@ -11,6 +11,7 @@
 #include "Camera.h" 
 #include <mmsystem.h>
 #include "skybox.h"
+#include "ImageSprite.h"
 
 Camera camera;
 Skybox skybox;
@@ -20,7 +21,7 @@ Skybox skybox;
 #pragma comment(lib,"winmm.lib")
 
 #define MAX_LOADSTRING 100
-
+bool isClickButton = false;
 // 全局变量:
 HINSTANCE hInst;                                // 当前实例
 WCHAR szTitle[MAX_LOADSTRING];                  // 标题栏文本
@@ -86,20 +87,24 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	wglMakeCurrent(dc, rc);
 	glViewport(0,0,viewportWidth,viewportHeight);
 
-	//opengl init
-	glMatrixMode(GL_PROJECTION);
-	gluPerspective(60,(float)viewportWidth/ (float)viewportHeight,0.1f,1000.0f);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	// opengl init
+	camera.mViewportWidth = viewportWidth;
+	camera.mViewportHeight = viewportHeight;
 
-	/*char* str = (char*)LoadFileContent("text.txt");
-	printf("%s\n", str);*/
+	// texture load
 	Texture* texture = Texture::LoadTexture("res/earth.bmp"); 
 
+	// obj model load.
 	ObjLoader objLoader;
 	objLoader.Init("res/Sphere.obj"); 
 
+	// skybox load
 	skybox.Init("res/skybox");
+
+	// image sprite load
+	ImageSprite sprite;
+	sprite.SetRect(-200.0f,-200.0f,100.0f,100.0f);
+	sprite.SetTexture(Texture::LoadTexture("res/头像 男孩.png"));
 
 	glClearColor(0.1f,0.4f,0.6f,1.0f); // set clear color for background
 
@@ -145,6 +150,25 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg; 
 	static float sTimeSinceStartUp = timeGetTime() / 1000.0f;
+
+	float hW = viewportWidth / 2.0f;
+	float hH = viewportHeight / 2.0f;
+
+	float vertices[] = 
+	{
+		-hW, -hH, 0,
+		0, -hH, 0,
+		0, 0, 0,
+		-hW, 0, 0
+	};
+
+	float texcoords[] = 
+	{
+		0.0f, 0.0f,
+		1.0f,0.0f,
+		1.0f,1.0f,
+		0.0f,1.0f
+	};
 	 
     // 主消息循环:
     while (/*GetMessage(&msg, nullptr, 0, 0)*/true)
@@ -166,6 +190,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 		// draw scene
 		glLoadIdentity(); // 重置为单位矩阵
+		camera.SwitchTo3D();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		float currentTime = timeGetTime() / 1000.0f;
 		float timeElapse = currentTime - sTimeSinceStartUp; 
@@ -174,13 +199,31 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// set up camera
 		camera.Update(timeElapse); // 固定为60FPS
 		skybox.Draw(camera.mPos);
-			
-		
-		//glPushMatrix();
+
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D,texture->mTextureID);
 		objLoader.Draw(); 
 
+		// draw 2d ui , switch camerat to 2d mode.
+		camera.SwitchTo2D();
+		glLoadIdentity();
+		/*glPushMatrix();
+		if (isClickButton)
+		{
+			glScalef(0.8f, 0.8f, 0.8f);
+		}*/
+		//glBegin(GL_QUADS);
+
+		/*glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_FLOAT, 0, vertices);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
+		glDrawArrays(GL_QUADS, 0, 4);*/
+
+		sprite.Draw();
+		
+		//glEnd();
+		glPopMatrix();
 		SwapBuffers(dc);
     }
 
@@ -217,10 +260,30 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 POINT originPos;
 bool bRotateView = false;
 
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+		case WM_LBUTTONDOWN:
+		{
+			float x = LOWORD(lParam);
+			float y = HIWORD(lParam);
+			x = x - camera.mViewportWidth / 2.0f;
+			y = camera.mViewportHeight / 2.0f - y;
+			if (x > -camera.mViewportWidth / 2.0f && x < 0) 
+			{
+				if (y < 0 && y > -camera.mViewportHeight / 2.0f)
+				{
+					isClickButton = true;
+				}
+			}
+
+			break;
+		}
+	case WM_LBUTTONUP:
+		isClickButton = false;
+		break;
 	case WM_KEYDOWN:
 		switch (wParam)
 		{
@@ -278,8 +341,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			mousePos.x = LOWORD(lParam);
 			mousePos.y = HIWORD(lParam);
 			ClientToScreen(hWnd, &mousePos);
-			float offsetX = mousePos.x - originPos.x;
-			float offsetY = mousePos.y - originPos.y;
+			long offsetX = mousePos.x - originPos.x;
+			long offsetY = mousePos.y - originPos.y;
 			float angleByUp = -(float)offsetX / 1000.0f;
 			float angleByRight = -(float)offsetY / 1000.0f;
 			camera.Pitch(angleByRight);
