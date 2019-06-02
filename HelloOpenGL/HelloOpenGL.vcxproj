@@ -160,6 +160,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DisplayList.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="HelloOpenGL.h" />
     <ClInclude Include="objloader.h" />
@@ -170,6 +171,7 @@
     <ClInclude Include="vertexData.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DisplayList.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="objloader.cpp" />
     <ClCompile Include="texture.cpp" />
