@@ -8,8 +8,16 @@
 #include "texture.h"
 #include "util.h"
 #include "objloader.h"
+#include "Camera.h" 
+#include <mmsystem.h>
+#include "skybox.h"
+
+Camera camera;
+Skybox skybox;
+  
 #pragma comment(lib,"opengl32.lib")
 #pragma comment(lib,"glu32.lib")
+#pragma comment(lib,"winmm.lib")
 
 #define MAX_LOADSTRING 100
 
@@ -43,9 +51,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     {
         return FALSE;
     }*/
+	RECT rect;
+	rect.left = 0;
+	rect.right = 800;
+	rect.top = 0;
+	rect.bottom = 600;
+	AdjustWindowRect(&rect,WS_OVERLAPPEDWINDOW,NULL);
+
 
 	HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+		100, 100, rect.right-rect.left, rect.bottom-rect.top, nullptr, nullptr, hInstance, nullptr);
+
+	GetClientRect(hWnd, &rect);
+	int viewportWidth = rect.right - rect.left;
+	int viewportHeight = rect.bottom - rect.top;
 
 	// creata opengl render context
 	HDC dc = GetDC(hWnd);
@@ -65,21 +84,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	HGLRC rc = wglCreateContext(dc);
 	wglMakeCurrent(dc, rc);
+	glViewport(0,0,viewportWidth,viewportHeight);
 
 	//opengl init
 	glMatrixMode(GL_PROJECTION);
-	gluPerspective(60,800.0f/600.0f,0.1f,1000.0f);
+	gluPerspective(60,(float)viewportWidth/ (float)viewportHeight,0.1f,1000.0f);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
 	/*char* str = (char*)LoadFileContent("text.txt");
 	printf("%s\n", str);*/
-	Texture texture;
-	texture.Init("res/test.bmp"); // init opengl texture
+	Texture* texture = Texture::LoadTexture("res/earth.bmp"); 
 
 	ObjLoader objLoader;
-	objLoader.init("res/Quad.obj");
-	
+	objLoader.Init("res/Sphere.obj"); 
+
+	skybox.Init("res/skybox");
 
 	glClearColor(0.1f,0.4f,0.6f,1.0f); // set clear color for background
 
@@ -91,27 +111,30 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd); 
 	glEnable(GL_CULL_FACE);  // ccw
+	glEnable(GL_DEPTH_TEST);
 
 	// init light
-	float blackColor[] = {1.0f,1.0f,1.0f,1.0f};
+	float whiteColor[] = {1.0f,1.0f,1.0f,1.0f};
+	float grayColor[] = {0.2f,0.2f, 0.2f, 1.0f};
 	float lightPos[] = {0.0f,1.0f,0.0f,0.0f}; // todo : qi ci zuobiao 
-	glLightfv(GL_LIGHT0,GL_AMBIENT, blackColor);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, blackColor);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, blackColor);
+	glLightfv(GL_LIGHT0,GL_AMBIENT, whiteColor);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, whiteColor);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, whiteColor);
 	glLightfv(GL_LIGHT0,GL_POSITION, lightPos); // direction light /  spot light /  point light
 
 	// material 
-	float blackMat[] = {1.0f,1.0f,1.0f,1.0f};
-	float ambient[] = {0.2f,0.2f,0.2f,1.0f};
-	float diffuse[] = {1.0f,0.0f,0.0f,1.0f};
+	float blackMat[] = {0.0f,0.0f,0.0f,1.0f};
+	float ambient[] = {0.1f,0.1f,0.1f,1.0f};
+	float diffuse[] = {0.4f,0.4f,0.4f,1.0f};
+	float specular[] = {0.9f,0.9f,0.9f,1.0f};
 	
 	glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, blackMat);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+	glMaterialf(GL_FRONT,GL_SHININESS,30.0f);
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-
 
 	/*glPolygonMode(GL_FRONT,GL_POINT);
 	glEnable(GL_POINT_SMOOTH);
@@ -120,111 +143,49 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_HELLOOPENGL));
 
-    MSG msg;
-
+    MSG msg; 
+	static float sTimeSinceStartUp = timeGetTime() / 1000.0f;
+	 
     // 主消息循环:
-    while (GetMessage(&msg, nullptr, 0, 0))
+    while (/*GetMessage(&msg, nullptr, 0, 0)*/true)
     {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+        /*if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
-        } 
+        } */
+
+		if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE)) 
+		{
+			if (msg.message == WM_QUIT)
+			{
+				break;
+			}
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
 		// draw scene
-		//glLoadIdentity(); // 重置为单位矩阵
-		glClear(GL_COLOR_BUFFER_BIT);
-		glPushMatrix();
-		objLoader.Draw();
-
-		// bind texture for mesh
-		//glEnable(GL_TEXTURE_2D);
-		//glBindTexture(GL_TEXTURE_2D, texture.mTextureID);
+		glLoadIdentity(); // 重置为单位矩阵
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		float currentTime = timeGetTime() / 1000.0f;
+		float timeElapse = currentTime - sTimeSinceStartUp; 
+		sTimeSinceStartUp = currentTime;
+		//printf("tiem elapse since last frame : %f\n", timeElapse);
+		// set up camera
+		camera.Update(timeElapse); // 固定为60FPS
+		skybox.Draw(camera.mPos);
+			
 		
+		//glPushMatrix();
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D,texture->mTextureID);
+		objLoader.Draw(); 
 
-		/*glScalef(1.0f, 1.0f,1.0f);
-		glRotatef(30.0f,0.0f,0.0f,1.0f);
-		glTranslatef(5.0f,0.0f,0.0f);*/
-
-		glColor4ub(255,255,255,255); // set current color : white
-
-		//glPointSize(10.0f);
-		//glBegin(GL_POINTS); // start to draw something
-		//glVertex3f(0.0f,0.0f,-0.5f);
-
-		/*glPointSize(10.0f);
-		glLineWidth(2.0f);*/
-
-		// line type
-		//glBegin(GL_LINES);
-		//glBegin(GL_LINE_LOOP);
-		//glBegin(GL_LINE_STRIP);
-
-		// triangles front face : ccw counter clock wise
-		//glBegin(GL_TRIANGLES); 
-		//glBegin(GL_TRIANGLE_STRIP); // 奇数点 n n+1 n+2 // 偶数点 n+1 n n+2
-		
-		
-		/*glColor4ub(255, 0, 0, 255); 
-		glVertex3f(0.0f,0.0f,-15.0f);
-		glColor4ub(0, 255, 0, 255);
-		glVertex3f(5.0f, 0.0f, -15.0f);
-		glColor4ub(0, 0, 255, 255);
-		glVertex3f(0.0f, 5.0f, -15.0f);
-		glColor4ub(255, 0, 0, 255);
-		glVertex3f(-5.0f, 0.0f, -15.0f);
-		glColor4ub(0, 255, 0, 255);
-		glVertex3f(0.0f, 10.0f, -15.0f); */
-		//glColor4ub(0, 0, 255, 255);
-		//glVertex3f(5.0f, 5.0f, -15.0f);
-
-		// quad
-		//glBegin(GL_QUADS);
-		//glBegin(GL_QUAD_STRIP); // n/2 -1 个四边形 // 2n-1 2n 2n+2 2n+1
-
-		// polygon
-		//glBegin(GL_POLYGON);
-		/*glColor4ub(255, 255, 0, 255);
-		glVertex3f(4.0f, 4.0f, -10.0f);
-		glVertex3f(-4.0f, 4.0f, -10.0f);
-		glVertex3f(-4.0f, -4.0f, -10.0f);*/
-		/*glColor4ub(255, 255, 255, 255);
-		glVertex3f(4.0f, 4.0f,-10.0f);
-		glVertex3f(-4.0f, 4.0f, -10.0f);*/
-	/*	glVertex3f(-4.0f, -4.0f, -10.0f);
-		glVertex3f(4.0f, -4.0f, -10.0f);*/
-
-		glBegin(GL_TRIANGLE_FAN);
-		float width = 5.0f;
-
-		glColor4ub(255, 0, 0, 255);
-		glTexCoord2f(0.0f, 2.0f);
-		glNormal3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(-width, -1.0f, -width - 10);
-		
-		glColor4ub(255,0,0,255);
-		glTexCoord2f(0.0f, 0.0f);
-		glNormal3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(-width,-1.0f, width - 10);
-
-		glColor4ub(0, 255, 0, 255);
-		glTexCoord2f(2.0f, 0.0f);
-		glNormal3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(width, -1.0f, width - 10);
-
-		glColor4ub(0, 0, 255, 255);
-		glTexCoord2f(2.0f, 2.0f);
-		glNormal3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(width, -1.0f, -width - 10.0f);
-
-		glEnd();// draw end
-		glPopMatrix();
-		// present scene
 		SwapBuffers(dc);
     }
 
     return (int) msg.wParam;
 }
-
 
 
 //
@@ -251,22 +212,95 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
     return RegisterClassExW(&wcex);
-} 
+}  
 
-//
-//  函数: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  目标: 处理主窗口的消息。
-//
-//  WM_COMMAND  - 处理应用程序菜单
-//  WM_PAINT    - 绘制主窗口
-//  WM_DESTROY  - 发送退出消息并返回
-//
-//
+POINT originPos;
+bool bRotateView = false;
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+	case WM_KEYDOWN:
+		switch (wParam)
+		{
+			case  'A':
+				camera.isMoveLeft = true;
+				break;
+			case  'D':
+				camera.isMoveRight = true;
+				break;
+			case 'W':
+				camera.isMoveForward = true;
+				break;
+			case 'S':
+				camera.isMoveBack = true;
+				break;
+			case 'Q':
+				camera.isLeftRotate = true;
+				break;
+			case 'E':
+				camera.isRightRotate = true;
+				break;
+			default:
+				break;
+		}
+		break;
+	case WM_KEYUP:
+		switch (wParam)
+		{
+		case  'A':
+			camera.isMoveLeft = false;
+			break;
+		case  'D':
+			camera.isMoveRight = false;
+			break;
+		case 'W':
+			camera.isMoveForward = false;
+			break;
+		case 'S':
+			camera.isMoveBack = false;
+			break;
+		case 'Q':
+			camera.isLeftRotate = false;
+			break;
+		case 'E':
+			camera.isRightRotate = false;
+			break;
+		default:
+			break;
+		}
+		break;
+	case WM_MOUSEMOVE:
+		if (bRotateView) 
+		{
+			POINT mousePos;
+			mousePos.x = LOWORD(lParam);
+			mousePos.y = HIWORD(lParam);
+			ClientToScreen(hWnd, &mousePos);
+			float offsetX = mousePos.x - originPos.x;
+			float offsetY = mousePos.y - originPos.y;
+			float angleByUp = -(float)offsetX / 1000.0f;
+			float angleByRight = -(float)offsetY / 1000.0f;
+			camera.Pitch(angleByRight);
+			camera.Yaw(angleByUp);
+			SetCursorPos(originPos.x,originPos.y);
+		}
+		break;
+	case WM_RBUTTONDOWN:
+		originPos.x = LOWORD(lParam);
+		originPos.y = HIWORD(lParam);
+		ClientToScreen(hWnd, &originPos);
+		SetCapture(hWnd);
+		ShowCursor(false);
+		bRotateView = true;
+		break;
+	case WM_RBUTTONUP:
+		bRotateView = false;
+		SetCursorPos(originPos.x,originPos.y);
+		ReleaseCapture();
+		ShowCursor(true);		
+		break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);

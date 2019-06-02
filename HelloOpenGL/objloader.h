@@ -7,7 +7,7 @@ public:
 	vertexData*mVertexes;
 	int *mIndices;
 	int mIndexCount;
-	void init(const char* objModel);
+	void Init(const char* objModel);
 	void Draw();
 };
 

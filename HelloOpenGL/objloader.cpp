@@ -4,23 +4,22 @@
 #include <sstream>
 #include <vector>
 
-void ObjLoader::init(const char* objModel) 
+void ObjLoader::Init(const char* objModel) 
 {
-	struct FloatData 
+	struct FloatData
 	{
 		float v[3];
 	};
 
-	struct VerticeDefine 
+	struct VerticeDefine
 	{
 		int posIndex;
 		int texcoordIndex;
 		int normalIndex;
 	};
-
 	std::vector<FloatData> positions, texcoords, normals;
-	std::vector<VerticeDefine> vertexes; // unique vertexes
-	std::vector<int> indexes;
+	std::vector<VerticeDefine> vertexes;//unique vertex
+	std::vector<int> indexes;//
 
 	unsigned char* fileContent = LoadFileContent(objModel);
 	std::stringstream ssFileContent((char*)fileContent);
@@ -37,7 +36,6 @@ void ObjLoader::init(const char* objModel)
 				std::stringstream ssOneLine(szOneLine);
 				if (szOneLine[1] == 't')
 				{
-					// texcoord
 					ssOneLine >> temp;
 					FloatData floatData;
 					ssOneLine >> floatData.v[0];
@@ -46,7 +44,6 @@ void ObjLoader::init(const char* objModel)
 				}
 				else if (szOneLine[1] == 'n')
 				{
-					// normal 
 					ssOneLine >> temp;
 					FloatData floatData;
 					ssOneLine >> floatData.v[0];
@@ -56,7 +53,6 @@ void ObjLoader::init(const char* objModel)
 				}
 				else
 				{
-					// position
 					ssOneLine >> temp;
 					FloatData floatData;
 					ssOneLine >> floatData.v[0];
@@ -68,8 +64,7 @@ void ObjLoader::init(const char* objModel)
 			else if (szOneLine[0] == 'f')
 			{
 				std::stringstream ssOneLine(szOneLine);
-
-				ssOneLine >> temp; // f
+				ssOneLine >> temp;//
 				std::string vertexStr;// 1/1/1
 				for (int i = 0; i < 3; i++)
 				{
@@ -77,22 +72,19 @@ void ObjLoader::init(const char* objModel)
 					size_t pos = vertexStr.find_first_of('/');
 					std::string posIndexStr = vertexStr.substr(0, pos);
 					size_t pos2 = vertexStr.find_first_of('/', pos + 1);
-					std::string texcoordStr = vertexStr.substr(pos+1,pos2-1-pos);
-					std::string normalStr = vertexStr.substr(pos2+1,vertexStr.length()-1-pos2);
-				
+					std::string texcoordIndexStr = vertexStr.substr(pos + 1, pos2 - 1 - pos);
+					std::string normalIndexStr = vertexStr.substr(pos2 + 1, vertexStr.length() - 1 - pos2);
 					VerticeDefine vd;
 					vd.posIndex = atoi(posIndexStr.c_str());
-					vd.texcoordIndex = atoi(texcoordStr.c_str());
-					vd.normalIndex = atoi(normalStr.c_str());
-
+					vd.texcoordIndex = atoi(texcoordIndexStr.c_str());
+					vd.normalIndex = atoi(normalIndexStr.c_str());
 					int nCurrentVertexIndex = -1;
 					int nCurrentVertexCount = (int)vertexes.size();
-					for (int j = 0 ;j < nCurrentVertexCount;j++)
+					for (int j = 0; j < nCurrentVertexCount; ++j)
 					{
-						if (vertexes[j].posIndex == vd.posIndex
-							&& vertexes[j].texcoordIndex == vd.texcoordIndex
-							&& vertexes[j].normalIndex == vd.normalIndex
-							) 
+						if (vertexes[j].posIndex == vd.posIndex &&
+							vertexes[j].normalIndex == vd.normalIndex &&
+							vertexes[j].texcoordIndex == vd.texcoordIndex)
 						{
 							nCurrentVertexIndex = j;
 							break;
@@ -105,9 +97,10 @@ void ObjLoader::init(const char* objModel)
 					}
 					indexes.push_back(nCurrentVertexIndex);
 				}
-			} 
+			}
 		}
 	}
+	printf("unique vertex count %u index count %u\n", vertexes.size(), indexes.size());
 	mIndexCount = (int)indexes.size();
 	mIndices = new int[mIndexCount];
 	for (int i = 0; i < mIndexCount; ++i)
@@ -116,7 +109,7 @@ void ObjLoader::init(const char* objModel)
 	}
 	int vertexCount = (int)vertexes.size();
 	mVertexes = new vertexData[vertexCount];
-	for (int i = 0; i < vertexCount;i++ )
+	for (int i = 0; i < vertexCount; ++i)
 	{
 		memcpy(mVertexes[i].position, positions[vertexes[i].posIndex - 1].v, sizeof(float) * 3);
 		memcpy(mVertexes[i].texcoord, texcoords[vertexes[i].texcoordIndex - 1].v, sizeof(float) * 2);
@@ -127,14 +120,25 @@ void ObjLoader::init(const char* objModel)
 
 void ObjLoader::Draw()
 {
-	glPolygonMode(GL_FRONT, GL_LINE);
+	static float angle = 0.0f;
+	angle += 0.2f; 
+	if (angle > 360.0f)
+	{
+		angle = 0.0f;
+	}
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	//glPolygonMode(GL_FRONT, GL_LINE);
 	glPushMatrix();
-	glTranslatef(0, 0, -2.0f);
+	glTranslatef(0, 0, -5.0f);
+	glRotatef(angle,0.0f,1.0f,0.0f);
+	//glScalef(0.01,0.01f,0.01f);
 	glBegin(GL_TRIANGLES);
 	for (int i = 0; i < mIndexCount; ++i)
 	{
-		glVertex3f(mVertexes[mIndices[i]].position[0],mVertexes[mIndices[i]].position[1], mVertexes[mIndices[i]].position[2]);
-		//glVertex3fv(mVertexes[mIndices[i]].position);
+		glTexCoord2fv(mVertexes[mIndices[i]].texcoord);
+		glNormal3fv(mVertexes[mIndices[i]].normal);
+		glVertex3fv(mVertexes[mIndices[i]].position);
 	}
 	glEnd();
 	glPopMatrix();
