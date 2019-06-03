@@ -32,6 +32,7 @@ void ImageSprite::Draw()
 	glBindTexture(GL_TEXTURE_2D, mTexture->mTextureID);
 	glBegin(GL_QUADS);
 
+	glColor4ub(255,255,255,255);
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex3fv(mMesh[0].v);
 

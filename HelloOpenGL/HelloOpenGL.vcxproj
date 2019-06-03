@@ -163,6 +163,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DisplayList.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Ground.h" />
     <ClInclude Include="HelloOpenGL.h" />
     <ClInclude Include="ImageSprite.h" />
     <ClInclude Include="objloader.h" />
@@ -177,6 +178,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DisplayList.cpp" />
+    <ClCompile Include="Ground.cpp" />
     <ClCompile Include="ImageSprite.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="objloader.cpp" />

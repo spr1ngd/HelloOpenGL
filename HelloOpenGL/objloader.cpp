@@ -119,20 +119,10 @@ void ObjLoader::Init(const char* objModel)
 }
 
 void ObjLoader::Draw()
-{
-	static float angle = 0.0f;
-	angle += 0.2f; 
-	if (angle > 360.0f)
-	{
-		angle = 0.0f;
-	}
+{ 
 	glEnable(GL_LIGHTING);
-	glEnable(GL_DEPTH_TEST);
-	//glPolygonMode(GL_FRONT, GL_LINE);
-	glPushMatrix();
-	glTranslatef(0, 0, -5.0f);
-	glRotatef(angle,0.0f,1.0f,0.0f);
-	//glScalef(0.01,0.01f,0.01f);
+	glEnable(GL_DEPTH_TEST); 
+	glPushMatrix();  
 	glBegin(GL_TRIANGLES);
 	for (int i = 0; i < mIndexCount; ++i)
 	{

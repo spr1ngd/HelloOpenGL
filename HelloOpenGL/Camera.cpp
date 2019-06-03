@@ -4,8 +4,8 @@
 #include <gl/GLU.h>
 #include <stdio.h>
 
-Camera::Camera() :mPos(0.0f, 0.0f, 0.0f),
-mViewCenter(0.0f, 0.0f, -1.0f),
+Camera::Camera() :mPos(0.0f, 0.0f, 5.0f),
+mViewCenter(0.0f, 0.0f, 3.0f),
 mUp(0.0f, 1.0f, 0.0f),
 isMoveLeft(false),
 isMoveRight(false),

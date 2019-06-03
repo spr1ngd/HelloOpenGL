@@ -1,4 +1,6 @@
-﻿  main.cpp
-D:\Project Files\Unity Projects\springdong\HelloOpenGL\HelloOpenGL\main.cpp(91,26): warning C4244:  “=”: 从“int”转换到“float”，可能丢失数据
-D:\Project Files\Unity Projects\springdong\HelloOpenGL\HelloOpenGL\main.cpp(92,27): warning C4244:  “=”: 从“int”转换到“float”，可能丢失数据
-  HelloOpenGL.vcxproj -> D:\Project Files\Unity Projects\springdong\HelloOpenGL\HelloOpenGL\Debug\HelloOpenGL.exe
+﻿  Camera.cpp
+soil.lib(image_DXT.obj) : warning LNK4099: 未找到 PDB“”(使用“soil.lib(image_DXT.obj)”或在“”中寻找)；正在链接对象，如同没有调试信息一样
+soil.lib(image_helper.obj) : warning LNK4099: 未找到 PDB“蔁”(使用“soil.lib(image_helper.obj)”或在“蔁”中寻找)；正在链接对象，如同没有调试信息一样
+soil.lib(SOIL.obj) : warning LNK4099: 未找到 PDB“蔁”(使用“soil.lib(SOIL.obj)”或在“蔁”中寻找)；正在链接对象，如同没有调试信息一样
+soil.lib(stb_image_aug.obj) : warning LNK4099: 未找到 PDB“蔁”(使用“soil.lib(stb_image_aug.obj)”或在“蔁”中寻找)；正在链接对象，如同没有调试信息一样
+  HelloOpenGL.vcxproj -> D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\Debug\HelloOpenGL.exe

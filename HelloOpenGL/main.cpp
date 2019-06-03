@@ -12,6 +12,7 @@
 #include <mmsystem.h>
 #include "skybox.h"
 #include "ImageSprite.h"
+#include "Ground.h"
 
 Camera camera;
 Skybox skybox;
@@ -100,6 +101,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// skybox load
 	skybox.Init("res/skybox");
+
+	// ground load
+	Ground ground;
+	ground.Init();
 
 	// image sprite load
 	ImageSprite sprite;
@@ -200,6 +205,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		camera.Update(timeElapse); // 固定为60FPS
 		skybox.Draw(camera.mPos);
 
+		ground.Draw();
+
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D,texture->mTextureID);
 		objLoader.Draw(); 
@@ -207,18 +214,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// draw 2d ui , switch camerat to 2d mode.
 		camera.SwitchTo2D();
 		glLoadIdentity();
-		/*glPushMatrix();
-		if (isClickButton)
-		{
-			glScalef(0.8f, 0.8f, 0.8f);
-		}*/
-		//glBegin(GL_QUADS);
-
-		/*glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, 0, vertices);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
-		glDrawArrays(GL_QUADS, 0, 4);*/
 
 		sprite.Draw();
 		
