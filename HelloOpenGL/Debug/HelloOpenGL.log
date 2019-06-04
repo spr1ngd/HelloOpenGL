@@ -1,6 +1,16 @@
-﻿  Camera.cpp
-soil.lib(image_DXT.obj) : warning LNK4099: 未找到 PDB“”(使用“soil.lib(image_DXT.obj)”或在“”中寻找)；正在链接对象，如同没有调试信息一样
-soil.lib(image_helper.obj) : warning LNK4099: 未找到 PDB“蔁”(使用“soil.lib(image_helper.obj)”或在“蔁”中寻找)；正在链接对象，如同没有调试信息一样
-soil.lib(SOIL.obj) : warning LNK4099: 未找到 PDB“蔁”(使用“soil.lib(SOIL.obj)”或在“蔁”中寻找)；正在链接对象，如同没有调试信息一样
-soil.lib(stb_image_aug.obj) : warning LNK4099: 未找到 PDB“蔁”(使用“soil.lib(stb_image_aug.obj)”或在“蔁”中寻找)；正在链接对象，如同没有调试信息一样
+﻿  main.cpp
+D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\main.cpp(92,26): warning C4244:  “=”: 从“int”转换到“float”，可能丢失数据
+D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\main.cpp(93,27): warning C4244:  “=”: 从“int”转换到“float”，可能丢失数据
+D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\main.cpp(201,77): warning C4244:  “参数”: 从“float”转换到“GLsizei”，可能丢失数据
+D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\main.cpp(201,54): warning C4244:  “参数”: 从“float”转换到“GLsizei”，可能丢失数据
+D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\main.cpp(201,32): warning C4244:  “参数”: 从“float”转换到“GLint”，可能丢失数据
+D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\main.cpp(229,96): warning C4244:  “参数”: 从“float”转换到“GLsizei”，可能丢失数据
+D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\main.cpp(229,73): warning C4244:  “参数”: 从“float”转换到“GLsizei”，可能丢失数据
+D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\main.cpp(229,51): warning C4244:  “参数”: 从“float”转换到“GLint”，可能丢失数据
+D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\main.cpp(229,28): warning C4244:  “参数”: 从“float”转换到“GLint”，可能丢失数据
+D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\main.cpp(251,56): warning C4244:  “参数”: 从“float”转换到“GLsizei”，可能丢失数据
+D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\main.cpp(251,33): warning C4244:  “参数”: 从“float”转换到“GLsizei”，可能丢失数据
+D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\main.cpp(273,76): warning C4244:  “参数”: 从“float”转换到“GLsizei”，可能丢失数据
+D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\main.cpp(273,53): warning C4244:  “参数”: 从“float”转换到“GLsizei”，可能丢失数据
+D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\main.cpp(273,28): warning C4244:  “参数”: 从“float”转换到“GLint”，可能丢失数据
   HelloOpenGL.vcxproj -> D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\Debug\HelloOpenGL.exe

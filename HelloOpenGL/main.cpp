@@ -197,27 +197,101 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		glLoadIdentity(); // 重置为单位矩阵
 		camera.SwitchTo3D();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glViewport(0, viewportHeight / 2.0f, viewportWidth / 2.0f, viewportHeight / 2.0f);
+		
 		float currentTime = timeGetTime() / 1000.0f;
 		float timeElapse = currentTime - sTimeSinceStartUp; 
 		sTimeSinceStartUp = currentTime;
-		//printf("tiem elapse since last frame : %f\n", timeElapse);
 		// set up camera
 		camera.Update(timeElapse); // 固定为60FPS
 		skybox.Draw(camera.mPos);
-
-		ground.Draw();
-
+		ground.Draw(); 
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D,texture->mTextureID);
+		// mirror image
+		glDisable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_COLOR,GL_ONE);
+		glPushMatrix();
+		glTranslatef(0, -2.0f, 0);
+		glRotatef(180.0f, 1, 0, 0);
+		objLoader.Draw();
+		glPopMatrix();
+		glDisable(GL_BLEND);
+		glEnable(GL_DEPTH_TEST); 
 		objLoader.Draw(); 
-
 		// draw 2d ui , switch camerat to 2d mode.
-		camera.SwitchTo2D();
-		glLoadIdentity();
+		/*camera.SwitchTo2D();
+		glLoadIdentity(); 
+		sprite.Draw();*/ 
 
-		sprite.Draw();
-		
-		//glEnd();
+		glViewport(viewportWidth / 2.0f, viewportHeight / 2.0f, viewportWidth / 2.0f, viewportHeight / 2.0f);
+		glLoadIdentity();
+		gluLookAt(5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+		// set up camera
+		camera.Update(timeElapse); // 固定为60FPS
+		skybox.Draw(camera.mPos);
+		ground.Draw();
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
+		// mirror image
+		glDisable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_COLOR, GL_ONE);
+		glPushMatrix();
+		glTranslatef(0, -2.0f, 0);
+		glRotatef(180.0f, 1, 0, 0);
+		objLoader.Draw();
+		glPopMatrix();
+		glDisable(GL_BLEND);
+		glEnable(GL_DEPTH_TEST);
+		objLoader.Draw();
+
+		glViewport(0,0, viewportWidth / 2.0f, viewportHeight / 2.0f);
+		glLoadIdentity();
+		gluLookAt(0.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,1.0f);
+		// set up camera
+		camera.Update(timeElapse); // 固定为60FPS
+		skybox.Draw(camera.mPos);
+		ground.Draw();
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
+		// mirror image
+		glDisable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_COLOR, GL_ONE);
+		glPushMatrix();
+		glTranslatef(0, -2.0f, 0);
+		glRotatef(180.0f, 1, 0, 0);
+		objLoader.Draw();
+		glPopMatrix();
+		glDisable(GL_BLEND);
+		glEnable(GL_DEPTH_TEST);
+		objLoader.Draw();
+
+		glViewport(viewportWidth / 2.0f, 0, viewportWidth / 2.0f, viewportHeight / 2.0f);
+		glLoadIdentity();
+		gluLookAt(3.0f, 3.0f, 3.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+		// set up camera
+		camera.Update(timeElapse); // 固定为60FPS
+		skybox.Draw(camera.mPos);
+		ground.Draw();
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
+		// mirror image
+		glDisable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_COLOR, GL_ONE);
+		glPushMatrix();
+		glTranslatef(0, -2.0f, 0);
+		glRotatef(180.0f, 1, 0, 0);
+		objLoader.Draw();
+		glPopMatrix();
+		glDisable(GL_BLEND);
+		glEnable(GL_DEPTH_TEST);
+		objLoader.Draw();
+
 		glPopMatrix();
 		SwapBuffers(dc);
     }

@@ -120,8 +120,8 @@ void ObjLoader::Init(const char* objModel)
 
 void ObjLoader::Draw()
 { 
-	glEnable(GL_LIGHTING);
-	glEnable(GL_DEPTH_TEST); 
+	/*glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST); */
 	glPushMatrix();  
 	glBegin(GL_TRIANGLES);
 	for (int i = 0; i < mIndexCount; ++i)
