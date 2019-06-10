@@ -34,6 +34,44 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
+int viewportWidth;
+int viewportHeight;
+
+ObjLoader objLoader;
+Ground ground;
+Texture* texture;
+ImageSprite sprite;
+
+void RenderOneFrame(float deltaTime) 
+{
+	camera.SwitchTo3D();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glViewport(0, 0, viewportWidth, viewportHeight);
+	// set up camera
+	camera.Update(deltaTime); // 固定为60FPS
+	glEnable(GL_TEXTURE_2D);
+	skybox.Draw(camera.mPos);
+	ground.Draw();
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
+	// mirror image
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_COLOR, GL_ONE);
+	glPushMatrix();
+	glTranslatef(0, -2.0f, 0);
+	glRotatef(180.0f, 1, 0, 0);
+	objLoader.Draw();
+	glPopMatrix();
+	glDisable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+	objLoader.Draw();
+	//  draw 2d ui , switch camera to 2d mode.
+	camera.SwitchTo2D();
+	glLoadIdentity();
+	sprite.Draw();
+}
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -65,10 +103,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		100, 100, rect.right-rect.left, rect.bottom-rect.top, nullptr, nullptr, hInstance, nullptr);
 
 	GetClientRect(hWnd, &rect);
-	int viewportWidth = rect.right - rect.left;
-	int viewportHeight = rect.bottom - rect.top;
-
-	// creata opengl render context
+	viewportWidth = rect.right - rect.left;
+	viewportHeight = rect.bottom - rect.top;
+	// creat OpenGL render context
 	HDC dc = GetDC(hWnd);
 	PIXELFORMATDESCRIPTOR pfd;
 	memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
@@ -88,28 +125,32 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	wglMakeCurrent(dc, rc);
 	glViewport(0,0,viewportWidth,viewportHeight);
 
-	// opengl init
+	// OpenGL init
 	camera.mViewportWidth = viewportWidth;
 	camera.mViewportHeight = viewportHeight;
 
 	// texture load
-	Texture* texture = Texture::LoadTexture("res/earth.bmp"); 
+	texture = Texture::LoadTexture("res/earth.bmp"); 
 
 	// obj model load.
-	ObjLoader objLoader;
+
 	objLoader.Init("res/Sphere.obj"); 
 
 	// skybox load
-	skybox.Init("res/skybox");
-
-	// ground load
-	Ground ground;
+	skybox.Init("res/skybox"); 
+	
 	ground.Init();
 
 	// image sprite load
-	ImageSprite sprite;
-	sprite.SetRect(-200.0f,-200.0f,100.0f,100.0f);
 	sprite.SetTexture(Texture::LoadTexture("res/头像 男孩.png"));
+	sprite.SetRect(-200.0f,-200.0f,400.0f,300.0f); 
+
+	Texture* screenTexture = new Texture;
+	screenTexture->mTextureID = CaptureScreen(viewportWidth, viewportHeight, []()->void
+		{
+			RenderOneFrame(0.0f);
+		});
+	sprite.SetTexture(screenTexture);
 
 	glClearColor(0.1f,0.4f,0.6f,1.0f); // set clear color for background
 
@@ -194,105 +235,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 		// draw scene
-		glLoadIdentity(); // 重置为单位矩阵
-		camera.SwitchTo3D();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		glViewport(0, viewportHeight / 2.0f, viewportWidth / 2.0f, viewportHeight / 2.0f);
-		
+		glLoadIdentity(); // 重置为单位矩阵		
 		float currentTime = timeGetTime() / 1000.0f;
-		float timeElapse = currentTime - sTimeSinceStartUp; 
+		float timeElapse = currentTime - sTimeSinceStartUp;
 		sTimeSinceStartUp = currentTime;
-		// set up camera
-		camera.Update(timeElapse); // 固定为60FPS
-		skybox.Draw(camera.mPos);
-		ground.Draw(); 
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D,texture->mTextureID);
-		// mirror image
-		glDisable(GL_DEPTH_TEST);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_COLOR,GL_ONE);
-		glPushMatrix();
-		glTranslatef(0, -2.0f, 0);
-		glRotatef(180.0f, 1, 0, 0);
-		objLoader.Draw();
-		glPopMatrix();
-		glDisable(GL_BLEND);
-		glEnable(GL_DEPTH_TEST); 
-		objLoader.Draw(); 
-		// draw 2d ui , switch camerat to 2d mode.
-		/*camera.SwitchTo2D();
-		glLoadIdentity(); 
-		sprite.Draw();*/ 
-
-		glViewport(viewportWidth / 2.0f, viewportHeight / 2.0f, viewportWidth / 2.0f, viewportHeight / 2.0f);
-		glLoadIdentity();
-		gluLookAt(5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-		// set up camera
-		camera.Update(timeElapse); // 固定为60FPS
-		skybox.Draw(camera.mPos);
-		ground.Draw();
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
-		// mirror image
-		glDisable(GL_DEPTH_TEST);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_COLOR, GL_ONE);
-		glPushMatrix();
-		glTranslatef(0, -2.0f, 0);
-		glRotatef(180.0f, 1, 0, 0);
-		objLoader.Draw();
-		glPopMatrix();
-		glDisable(GL_BLEND);
-		glEnable(GL_DEPTH_TEST);
-		objLoader.Draw();
-
-		glViewport(0,0, viewportWidth / 2.0f, viewportHeight / 2.0f);
-		glLoadIdentity();
-		gluLookAt(0.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,1.0f);
-		// set up camera
-		camera.Update(timeElapse); // 固定为60FPS
-		skybox.Draw(camera.mPos);
-		ground.Draw();
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
-		// mirror image
-		glDisable(GL_DEPTH_TEST);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_COLOR, GL_ONE);
-		glPushMatrix();
-		glTranslatef(0, -2.0f, 0);
-		glRotatef(180.0f, 1, 0, 0);
-		objLoader.Draw();
-		glPopMatrix();
-		glDisable(GL_BLEND);
-		glEnable(GL_DEPTH_TEST);
-		objLoader.Draw();
-
-		glViewport(viewportWidth / 2.0f, 0, viewportWidth / 2.0f, viewportHeight / 2.0f);
-		glLoadIdentity();
-		gluLookAt(3.0f, 3.0f, 3.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-		// set up camera
-		camera.Update(timeElapse); // 固定为60FPS
-		skybox.Draw(camera.mPos);
-		ground.Draw();
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
-		// mirror image
-		glDisable(GL_DEPTH_TEST);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_COLOR, GL_ONE);
-		glPushMatrix();
-		glTranslatef(0, -2.0f, 0);
-		glRotatef(180.0f, 1, 0, 0);
-		objLoader.Draw();
-		glPopMatrix();
-		glDisable(GL_BLEND);
-		glEnable(GL_DEPTH_TEST);
-		objLoader.Draw();
-
-		glPopMatrix();
+		RenderOneFrame(timeElapse);
 		SwapBuffers(dc);
     }
 
