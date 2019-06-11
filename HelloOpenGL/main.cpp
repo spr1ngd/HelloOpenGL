@@ -13,6 +13,7 @@
 #include "skybox.h"
 #include "ImageSprite.h"
 #include "Ground.h"
+#include "button.h"
 
 Camera camera;
 Skybox skybox;
@@ -41,6 +42,7 @@ ObjLoader objLoader;
 Ground ground;
 Texture* texture;
 ImageSprite sprite;
+Button* button;
 
 void RenderOneFrame(float deltaTime) 
 {
@@ -69,7 +71,8 @@ void RenderOneFrame(float deltaTime)
 	//  draw 2d ui , switch camera to 2d mode.
 	camera.SwitchTo2D();
 	glLoadIdentity();
-	sprite.Draw();
+	//sprite.Draw();
+	button->Draw();
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -145,12 +148,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	sprite.SetTexture(Texture::LoadTexture("res/头像 男孩.png"));
 	sprite.SetRect(-200.0f,-200.0f,400.0f,300.0f); 
 
+	ImageSprite* buttonSprite = new ImageSprite;
+	buttonSprite->SetTexture(Texture::LoadTexture("res/timg.jpg"));
+	button = new Button;
+	button->SetDefaultSprite(buttonSprite);
+	button->SetRect(-350,250,100,100);
+	button->AddClickEvent([]()->void 
+		{
+
+		});
+
 	Texture* screenTexture = new Texture;
 	screenTexture->mTextureID = CaptureScreen(viewportWidth, viewportHeight, []()->void
 		{
 			RenderOneFrame(0.0f);
 		});
-	sprite.SetTexture(screenTexture);
+	sprite.SetTexture(screenTexture); 
 
 	SaveScreenPixel(viewportWidth, viewportHeight, []()->void
 		{

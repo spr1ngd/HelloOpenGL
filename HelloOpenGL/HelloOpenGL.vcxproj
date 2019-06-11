@@ -160,12 +160,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="button.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DisplayList.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Ground.h" />
     <ClInclude Include="HelloOpenGL.h" />
     <ClInclude Include="ImageSprite.h" />
+    <ClInclude Include="List.h" />
     <ClInclude Include="objloader.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Skybox.h" />
@@ -176,10 +178,12 @@
     <ClInclude Include="vertexData.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="button.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DisplayList.cpp" />
     <ClCompile Include="Ground.cpp" />
     <ClCompile Include="ImageSprite.cpp" />
+    <ClCompile Include="List.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="objloader.cpp" />
     <ClCompile Include="Skybox.cpp" />

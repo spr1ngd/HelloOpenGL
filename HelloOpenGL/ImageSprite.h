@@ -1,8 +1,9 @@
 #pragma once
 #include "texture.h"
 #include "Vector3f.h"
+#include "list.h"
 
-class ImageSprite
+class ImageSprite : public RenderableObject
 {
 public:
 	Texture* mTexture;

@@ -57,6 +57,12 @@
     <ClInclude Include="Ground.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="button.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="List.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="util.cpp">
@@ -90,6 +96,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Ground.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="button.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="List.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
