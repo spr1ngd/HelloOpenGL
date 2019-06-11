@@ -42,3 +42,39 @@ GLuint CaptureScreen(int width,int height ,std::function<void()>foo)
 	delete screenPixel;
 	return texture;
 }
+
+void SaveScreenPixel(int width, int height, std::function<void()>foo, const char* filePath)
+{
+	foo();
+	unsigned char* screenPixel = new unsigned char[width * height * 3];
+	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, screenPixel);
+
+	FILE* pFile = fopen(filePath,"wb");
+	if (pFile)
+	{
+		BITMAPFILEHEADER bfh;
+		memset(&bfh,0,sizeof(BITMAPFILEHEADER));
+		bfh.bfType = 0x4D42;
+		bfh.bfSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + width * height * 3;
+		bfh.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+		fwrite(&bfh,sizeof(BITMAPFILEHEADER),1,pFile);
+
+		BITMAPINFOHEADER bih;
+		memset(&bih,0,sizeof(BITMAPINFOHEADER));
+		bih.biWidth = width;
+		bih.biHeight = height;
+		bih.biBitCount = 24;
+		bih.biSize = sizeof(BITMAPINFOHEADER);
+		fwrite(&bih, sizeof(BITMAPINFOHEADER), 1, pFile);
+
+		// rgb to bgr
+		for (int i = 0; i < width * height * 3; i+=3)
+		{
+			unsigned char temp = screenPixel[i];
+			screenPixel[i] = screenPixel[i+2];
+			screenPixel[i + 2] = temp;
+		}
+		fwrite(screenPixel,1,width*height*3,pFile);
+		fclose(pFile);
+	}
+}

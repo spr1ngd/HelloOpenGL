@@ -1,4 +1,2 @@
-﻿  main.cpp
-D:\Project Files\Unity Projects\springdong\HelloOpenGL\HelloOpenGL\main.cpp(129,26): warning C4244:  “=”: 从“int”转换到“float”，可能丢失数据
-D:\Project Files\Unity Projects\springdong\HelloOpenGL\HelloOpenGL\main.cpp(130,27): warning C4244:  “=”: 从“int”转换到“float”，可能丢失数据
-  HelloOpenGL.vcxproj -> D:\Project Files\Unity Projects\springdong\HelloOpenGL\HelloOpenGL\Debug\HelloOpenGL.exe
+﻿  util.cpp
+  HelloOpenGL.vcxproj -> D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\Debug\HelloOpenGL.exe

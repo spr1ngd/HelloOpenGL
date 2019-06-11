@@ -152,6 +152,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		});
 	sprite.SetTexture(screenTexture);
 
+	SaveScreenPixel(viewportWidth, viewportHeight, []()->void
+		{
+			RenderOneFrame(0.0f);
+		}, "screenshot.bmp");
+
 	glClearColor(0.1f,0.4f,0.6f,1.0f); // set clear color for background
 
 	if (!hWnd)

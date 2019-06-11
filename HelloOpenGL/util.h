@@ -7,3 +7,5 @@
 unsigned char* LoadFileContent(const char*filePath);
 
 GLuint CaptureScreen(int width,int height,std::function<void()>foo);
+
+void SaveScreenPixel(int width,int height,std::function<void()>foo,const char*filePath);
