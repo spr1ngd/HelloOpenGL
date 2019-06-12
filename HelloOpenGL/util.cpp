@@ -78,3 +78,41 @@ void SaveScreenPixel(int width, int height, std::function<void()>foo, const char
 		fclose(pFile);
 	}
 }
+
+GLuint GenerateProceduralTexture( int size )
+{
+	// rgba
+	unsigned char* pixelData = new unsigned char[size*size*4];
+	float maxDistance = sqrtf((float)size*size+(float)size*size)/2.0f;
+	float centerX = size / 2.0f;
+	float centerY = size / 2.0f;
+	for (int y = 0; y < size; y++) 
+	{
+		for (int x = 0; x < size; x++) 
+		{
+			int offset = (y * size + x) * 4;
+			pixelData[offset] = 255.0f;
+			pixelData[offset + 1] = 255.0f;
+			pixelData[offset + 2] = 255.0f;
+
+			float deltaX = x - centerX;
+			float deltaY = y - centerY;
+			float distance = sqrtf(deltaX * deltaX + deltaY* deltaY);
+			float alpha = powf(1.0f-(distance / maxDistance),8.0f);
+			pixelData[offset + 3] = alpha * 255.0f;
+		}
+	}
+
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	//operation on current texture
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP/*GL_REPEAT*/);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP/*GL_REPEAT*/);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size, size, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelData);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	delete pixelData;
+	return texture;
+}

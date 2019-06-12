@@ -150,7 +150,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	sprite.SetTexture(Texture::LoadTexture("res/头像 男孩.png"));
 	sprite.SetRect(-200.0f,-200.0f,400.0f,300.0f); 
 	 
-	fadeImage.SetTexture(Texture::LoadTexture("res/timg.jpg"));
+	Texture* proceduralTexture = new Texture;
+	proceduralTexture->mTextureID = GenerateProceduralTexture(256.0f);
+	fadeImage.SetTexture(proceduralTexture);
 	fadeImage.SetRect(0,0,100.0f,100.0f);
 
 	ImageSprite* buttonSprite = new ImageSprite;

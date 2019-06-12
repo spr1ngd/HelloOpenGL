@@ -1,8 +1,8 @@
-﻿  ImageSprite.cpp
-D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\ImageSprite.cpp(62,34): warning C4244:  “-=”: 从“float”转换到“int”，可能丢失数据
-D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\ImageSprite.cpp(63,18): warning C4244:  “=”: 从“float”转换到“unsigned char”，可能丢失数据
-D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\ImageSprite.cpp(73,34): warning C4244:  “+=”: 从“float”转换到“int”，可能丢失数据
-D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\ImageSprite.cpp(74,18): warning C4244:  “=”: 从“float”转换到“unsigned char”，可能丢失数据
+﻿  util.cpp
+D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\util.cpp(94,24): warning C4244:  “=”: 从“float”转换到“unsigned char”，可能丢失数据
+D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\util.cpp(95,28): warning C4244:  “=”: 从“float”转换到“unsigned char”，可能丢失数据
+D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\util.cpp(96,28): warning C4244:  “=”: 从“float”转换到“unsigned char”，可能丢失数据
+D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\util.cpp(102,34): warning C4244:  “=”: 从“float”转换到“unsigned char”，可能丢失数据
   LINK : 没有找到 D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\Debug\HelloOpenGL.exe 或上一个增量链接没有生成它；正在执行完全链接
 soil.lib(image_DXT.obj) : warning LNK4099: 未找到 PDB“”(使用“soil.lib(image_DXT.obj)”或在“”中寻找)；正在链接对象，如同没有调试信息一样
 soil.lib(image_helper.obj) : warning LNK4099: 未找到 PDB“븁”(使用“soil.lib(image_helper.obj)”或在“븁”中寻找)；正在链接对象，如同没有调试信息一样
