@@ -3,7 +3,7 @@ class List
 {
 public:
 	List() :mNext(nullptr) {}
-	void* mNext;
+	List* mNext;
 	template<typename T>
 	T* Next() 
 	{

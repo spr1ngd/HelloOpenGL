@@ -23,7 +23,6 @@ Skybox skybox;
 #pragma comment(lib,"winmm.lib")
 
 #define MAX_LOADSTRING 100
-bool isClickButton = false;
 // 全局变量:
 HINSTANCE hInst;                                // 当前实例
 WCHAR szTitle[MAX_LOADSTRING];                  // 标题栏文本
@@ -35,14 +34,15 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-int viewportWidth;
-int viewportHeight;
+float viewportWidth;
+float viewportHeight;
 
 ObjLoader objLoader;
 Ground ground;
 Texture* texture;
 ImageSprite sprite;
 Button* button;
+ImageSprite fadeImage;
 
 void RenderOneFrame(float deltaTime) 
 {
@@ -73,6 +73,8 @@ void RenderOneFrame(float deltaTime)
 	glLoadIdentity();
 	//sprite.Draw();
 	button->Draw();
+	fadeImage.Update(deltaTime);
+	fadeImage.Draw();
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -147,6 +149,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// image sprite load
 	sprite.SetTexture(Texture::LoadTexture("res/头像 男孩.png"));
 	sprite.SetRect(-200.0f,-200.0f,400.0f,300.0f); 
+	 
+	fadeImage.SetTexture(Texture::LoadTexture("res/timg.jpg"));
+	fadeImage.SetRect(0,0,100.0f,100.0f);
 
 	ImageSprite* buttonSprite = new ImageSprite;
 	buttonSprite->SetTexture(Texture::LoadTexture("res/timg.jpg"));
@@ -155,8 +160,32 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	button->SetRect(-350,250,100,100);
 	button->AddClickEvent([]()->void 
 		{
-
+			printf("i am a button[HEAD IMAGE]\n");
 		});
+
+	ImageSprite* button2Sprite = new ImageSprite;
+	button2Sprite->SetTexture(Texture::LoadTexture("res/帮助.png"));
+	Button*button2 = new Button;
+	button2->SetDefaultSprite(button2Sprite);
+	button2->SetRect(370, 270, 30, 30);
+	button2->AddClickEvent([]()->void
+		{
+			printf("i am a button[HELPING]\n");
+			fadeImage.FadeOut(1.0f);
+		});
+	button->Push(button2);
+
+	ImageSprite* button3Sprite = new ImageSprite;
+	button3Sprite->SetTexture(Texture::LoadTexture("res/背包.png"));
+	Button* button3 = new Button;
+	button3->SetDefaultSprite(button3Sprite);
+	button3->SetRect(330, 270, 30, 30);
+	button3->AddClickEvent([]()->void
+		{
+			printf("i am a button[PACKAGE]\n");
+			fadeImage.FadeIn(1.0f);
+		});
+	button->Push(button3);
 
 	Texture* screenTexture = new Texture;
 	screenTexture->mTextureID = CaptureScreen(viewportWidth, viewportHeight, []()->void
@@ -294,30 +323,25 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 POINT originPos;
 bool bRotateView = false;
 
-
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	float x = LOWORD(lParam);
+	float y = HIWORD(lParam);
+	x = x - camera.mViewportWidth / 2.0f;
+	y = camera.mViewportHeight / 2.0f - y;
     switch (message)
     {
 		case WM_LBUTTONDOWN:
-		{
-			float x = LOWORD(lParam);
-			float y = HIWORD(lParam);
-			x = x - camera.mViewportWidth / 2.0f;
-			y = camera.mViewportHeight / 2.0f - y;
-			if (x > -camera.mViewportWidth / 2.0f && x < 0) 
-			{
-				if (y < 0 && y > -camera.mViewportHeight / 2.0f)
-				{
-					isClickButton = true;
-				}
-			}
-
+		{ 
+			button->OnTouchBegin(x,y);
 			break;
 		}
-	case WM_LBUTTONUP:
-		isClickButton = false;
-		break;
+		case WM_LBUTTONUP: 
+		{
+			button->OnTouchEnd(x, y);
+			button->Repaint();
+			break;
+		}
 	case WM_KEYDOWN:
 		switch (wParam)
 		{

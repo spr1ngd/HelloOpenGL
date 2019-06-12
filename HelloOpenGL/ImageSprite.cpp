@@ -1,5 +1,9 @@
 #include "ImageSprite.h"
 
+ImageSprite::ImageSprite() : mAlpha(255),mbFadeIn(false),mbFadeOut(false),mFadeSpeed(255)
+{
+}
+
 void ImageSprite::SetTexture(Texture* texture) 
 {
 	mTexture = texture;
@@ -32,7 +36,7 @@ void ImageSprite::Draw()
 	glBindTexture(GL_TEXTURE_2D, mTexture->mTextureID);
 	glBegin(GL_QUADS);
 
-	glColor4ub(255,255,255,255);
+	glColor4ub(255,255,255,mAlpha);
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex3fv(mMesh[0].v);
 
@@ -48,4 +52,45 @@ void ImageSprite::Draw()
 	glEnd();
 	glPopMatrix();
 	glDisable(GL_BLEND);
+}
+
+void ImageSprite::Update(float deltaTime) 
+{
+	if (mbFadeIn) 
+	{
+		int alpha = mAlpha;
+		alpha -= mFadeSpeed * deltaTime; 
+		mAlpha = alpha < 0.0f ? 0.0f : alpha;
+		if (mAlpha == 0.0f)
+		{
+			mbFadeIn = false; 
+		}
+	}
+	if (mbFadeOut)
+	{
+		int alpha = mAlpha;
+		alpha += mFadeSpeed * deltaTime;
+		mAlpha = alpha > 255.0f ? 255.0f : alpha;
+		if (mAlpha == 255.0f)
+		{
+			mbFadeOut = false; 
+		}
+	}
+	//printf("FADE VALUE : %d\n",mAlpha);
+}
+
+void ImageSprite::FadeIn(float duration) 
+{
+	if (mbFadeIn || mbFadeOut)
+		return; 
+	mbFadeIn = true;
+	mFadeSpeed = int(255.0f / duration);
+}
+
+void ImageSprite::FadeOut(float duration) 
+{
+	if (mbFadeIn || mbFadeOut)
+		return;
+	mbFadeOut = true; 
+	mFadeSpeed = int(255.0f / duration);
 }
