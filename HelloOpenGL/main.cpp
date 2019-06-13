@@ -14,6 +14,7 @@
 #include "ImageSprite.h"
 #include "Ground.h"
 #include "button.h"
+#include "particle.h"
 
 Camera camera;
 Skybox skybox;
@@ -43,6 +44,7 @@ Texture* texture;
 ImageSprite sprite;
 Button* button;
 ImageSprite fadeImage;
+Particle* rootParticle;
 
 void RenderOneFrame(float deltaTime) 
 {
@@ -73,8 +75,14 @@ void RenderOneFrame(float deltaTime)
 	glLoadIdentity();
 	//sprite.Draw();
 	button->Draw();
-	fadeImage.Update(deltaTime);
-	fadeImage.Draw();
+
+	// fade image
+	/*fadeImage.Update(deltaTime);
+	fadeImage.Draw();*/
+
+	// particle 
+	rootParticle->Update(deltaTime);
+	rootParticle->Draw();
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -150,10 +158,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	sprite.SetTexture(Texture::LoadTexture("res/头像 男孩.png"));
 	sprite.SetRect(-200.0f,-200.0f,400.0f,300.0f); 
 	 
+	// particle -> procedural texture.
 	Texture* proceduralTexture = new Texture;
 	proceduralTexture->mTextureID = GenerateProceduralTexture(256.0f);
-	fadeImage.SetTexture(proceduralTexture);
-	fadeImage.SetRect(0,0,100.0f,100.0f);
+	/*fadeImage.SetTexture(proceduralTexture);
+	fadeImage.SetRect(0,0,100.0f,100.0f);*/
+
+	rootParticle = new Particle(true);
+	rootParticle->SetTexture(proceduralTexture);
+	for (int i = 0; i < 1000; i++) 
+	{
+		Particle* particle01 = new Particle;
+		particle01->SetTexture(proceduralTexture);
+		particle01->SetRect(0, 0, 20.0f, 20.0f);
+		rootParticle->Push(particle01);
+	} 
 
 	ImageSprite* buttonSprite = new ImageSprite;
 	buttonSprite->SetTexture(Texture::LoadTexture("res/timg.jpg"));

@@ -29,10 +29,12 @@ void ImageSprite::SetRect(float x, float y, float width, float height)
 void ImageSprite::Draw() 
 {
 	glDisable(GL_LIGHTING);
+	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glPushMatrix();
+	glTranslatef(mPos.x, mPos.y, mPos.z);
 	glBindTexture(GL_TEXTURE_2D, mTexture->mTextureID);
 	glBegin(GL_QUADS);
 

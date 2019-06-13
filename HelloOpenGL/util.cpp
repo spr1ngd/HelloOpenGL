@@ -1,5 +1,15 @@
 #include "util.h"
 
+float randf()
+{
+	return (float)rand() / RAND_MAX;
+}
+
+float srandf() 
+{
+	return (randf() - 0.5f) * 2;
+}
+
 unsigned char* LoadFileContent(const char* filePath) 
 {
 	unsigned char* fileContent = nullptr;

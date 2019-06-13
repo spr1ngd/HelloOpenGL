@@ -10,14 +10,15 @@ public:
 	Texture* mTexture;
 	Vector3f mMesh[4];
 	unsigned char mAlpha;
-	int mFadeSpeed;
-	bool mbFadeIn, mbFadeOut;
+	Vector3f mPos;
+
 	void SetTexture(Texture* texture);
 	void SetRect(float x,float y ,float width,float height);
-	void Draw();
+	virtual void Draw();
 
-	void Update(float deltaTime);
+	int mFadeSpeed;
+	bool mbFadeIn, mbFadeOut;
+	virtual void Update(float deltaTime);
 	void FadeIn(float duration);
 	void FadeOut(float duration);
 };
-

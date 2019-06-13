@@ -11,3 +11,7 @@ GLuint CaptureScreen(int width,int height,std::function<void()>foo);
 void SaveScreenPixel(int width,int height,std::function<void()>foo,const char*filePath);
 
 GLuint GenerateProceduralTexture(int size);
+
+// random util
+float randf();
+float srandf();
