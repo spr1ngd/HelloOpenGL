@@ -9,9 +9,9 @@ public:
 	ImageSprite();
 	Texture* mTexture;
 	Vector3f mMesh[4];
-	unsigned char mAlpha;
+	unsigned char mR, mG, mB,mAlpha;
+	GLenum mBlendMode;
 	Vector3f mPos;
-
 	void SetTexture(Texture* texture);
 	void SetRect(float x,float y ,float width,float height);
 	virtual void Draw();

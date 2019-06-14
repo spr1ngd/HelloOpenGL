@@ -164,6 +164,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	/*fadeImage.SetTexture(proceduralTexture);
 	fadeImage.SetRect(0,0,100.0f,100.0f);*/
 
+	Particle::InitSpeed();
 	rootParticle = new Particle(true);
 	rootParticle->SetTexture(proceduralTexture);
 	for (int i = 0; i < 1000; i++) 
