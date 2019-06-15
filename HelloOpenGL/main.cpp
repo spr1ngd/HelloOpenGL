@@ -15,6 +15,7 @@
 #include "Ground.h"
 #include "button.h"
 #include "particle.h"
+#include "fbxmodel.h"
 
 Camera camera;
 Skybox skybox;
@@ -45,6 +46,7 @@ ImageSprite sprite;
 Button* button;
 ImageSprite fadeImage;
 Particle* rootParticle;
+FBXModel fbxModel;
 
 void RenderOneFrame(float deltaTime) 
 {
@@ -70,6 +72,7 @@ void RenderOneFrame(float deltaTime)
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	objLoader.Draw();
+	fbxModel.Draw();
 	//  draw 2d ui , switch camera to 2d mode.
 	camera.SwitchTo2D();
 	glLoadIdentity();
@@ -212,13 +215,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	Texture* screenTexture = new Texture;
 	screenTexture->mTextureID = CaptureScreen(viewportWidth, viewportHeight, []()->void
 		{
-			RenderOneFrame(0.0f);
+			//RenderOneFrame(0.0f);
 		});
 	sprite.SetTexture(screenTexture); 
 
+	// FBX MODEL
+	fbxModel.Init("res/fbx/tauren.fbx");
+
 	SaveScreenPixel(viewportWidth, viewportHeight, []()->void
 		{
-			RenderOneFrame(0.0f);
+			//RenderOneFrame(0.0f);
 		}, "screenshot.bmp");
 
 	glClearColor(0.1f,0.4f,0.6f,1.0f); // set clear color for background
@@ -308,6 +314,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		float currentTime = timeGetTime() / 1000.0f;
 		float timeElapse = currentTime - sTimeSinceStartUp;
 		sTimeSinceStartUp = currentTime;
+		glEnable(GL_SCISSOR_TEST);
+		glScissor(0,0,viewportWidth/2.0f,viewportHeight);
 		RenderOneFrame(timeElapse);
 		SwapBuffers(dc);
     }

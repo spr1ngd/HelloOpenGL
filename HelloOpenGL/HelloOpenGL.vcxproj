@@ -92,10 +92,12 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/D_CRT_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>D:\uinnova\12_Libs\2016.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>D:\uinnova\12_Libs\2016.1\lib\vs2015\x86\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>editbin /subsystem:console $(OutDir)$(ProjectName).exe</Command>
@@ -162,6 +164,7 @@
     <ClInclude Include="button.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DisplayList.h" />
+    <ClInclude Include="FBXModel.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Ground.h" />
     <ClInclude Include="HelloOpenGL.h" />
@@ -181,6 +184,7 @@
     <ClCompile Include="button.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DisplayList.cpp" />
+    <ClCompile Include="FBXModel.cpp" />
     <ClCompile Include="Ground.cpp" />
     <ClCompile Include="ImageSprite.cpp" />
     <ClCompile Include="List.cpp" />
