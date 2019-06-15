@@ -165,6 +165,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DisplayList.h" />
     <ClInclude Include="FBXModel.h" />
+    <ClInclude Include="fontmanager.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Ground.h" />
     <ClInclude Include="HelloOpenGL.h" />
@@ -185,6 +186,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DisplayList.cpp" />
     <ClCompile Include="FBXModel.cpp" />
+    <ClCompile Include="fontmanager.cpp" />
     <ClCompile Include="Ground.cpp" />
     <ClCompile Include="ImageSprite.cpp" />
     <ClCompile Include="List.cpp" />

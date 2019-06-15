@@ -69,6 +69,9 @@
     <ClInclude Include="FBXModel.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="fontmanager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="util.cpp">
@@ -114,6 +117,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="FBXModel.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="fontmanager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

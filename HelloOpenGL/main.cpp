@@ -16,6 +16,7 @@
 #include "button.h"
 #include "particle.h"
 #include "fbxmodel.h"
+#include "fontmanager.h"
 
 Camera camera;
 Skybox skybox;
@@ -140,6 +141,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	HGLRC rc = wglCreateContext(dc);
 	wglMakeCurrent(dc, rc);
 	glViewport(0,0,viewportWidth,viewportHeight);
+
+	FontManager::Init(dc);
 
 	// OpenGL init
 	camera.mViewportWidth = viewportWidth;
@@ -314,9 +317,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		float currentTime = timeGetTime() / 1000.0f;
 		float timeElapse = currentTime - sTimeSinceStartUp;
 		sTimeSinceStartUp = currentTime;
-		glEnable(GL_SCISSOR_TEST);
-		glScissor(0,0,viewportWidth/2.0f,viewportHeight);
+	/*	glEnable(GL_SCISSOR_TEST);
+		glScissor(0,0,viewportWidth/2.0f,viewportHeight);*/
 		RenderOneFrame(timeElapse);
+		glColor4ub(255,255,0,255);
+		glRasterPos2f(0, 0);
+		FontManager::Draw(L"你好，OPENGL");
 		SwapBuffers(dc);
     }
 
