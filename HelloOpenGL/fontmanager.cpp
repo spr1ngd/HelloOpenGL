@@ -21,14 +21,14 @@ void FontManager::Init(HDC dc)
 		CLIP_DEFAULT_PRECIS,
 		DEFAULT_QUALITY,
 		DEFAULT_PITCH,
-		L"ËÎÌו");
+		"ËÎÌו");
 	SelectObject(dc, hFont);
 }
 
 void FontManager::Draw(const wchar_t* str )
 {
 	glDisable(GL_LIGHTING);
-	int len = lstrlen(str);
+	int len = wcslen(str);
 	for (int i = 0; i < len; i++) 
 	{
 		auto iter = cachedChars.find(str[i]);

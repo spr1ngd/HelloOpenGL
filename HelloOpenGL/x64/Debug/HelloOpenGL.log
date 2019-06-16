@@ -1,8 +1,5 @@
-﻿  main.cpp
-  objloader.cpp
-  texture.cpp
-  util.cpp
-D:\uinnova\Unity\02_Unity_5_6_5\github\HelloOpenGL\HelloOpenGL\util.cpp(6,1): error C4996:  'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+﻿  fontmanager.cpp
   vertexData.cpp
   正在生成代码...
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\ucrt\stdio.h(208): message :  参见“fopen”的声明
+D:\Project Files\Unity Projects\springdong\HelloOpenGL\HelloOpenGL\fontmanager.cpp(31,23): warning C4267:  “初始化”: 从“size_t”转换到“int”，可能丢失数据
+libfbxsdk-md.lib(fbxtexture.obj) : fatal error LNK1112: 模块计算机类型“x86”与目标计算机类型“x64”冲突
