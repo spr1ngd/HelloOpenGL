@@ -2,3 +2,6 @@
 *.opendb
 Debug
 .vs
+HelloOpenGL/HelloOpenGL.vcxproj
+*.vcxproj
+OpenGL/OpenGL.vcxproj
