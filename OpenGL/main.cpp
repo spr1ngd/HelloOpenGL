@@ -3,18 +3,14 @@
 #include <stdio.h>
 #include "Glm/glm.hpp"
 #include "Glm/ext.hpp"
+#include "misc.h"
+#include "model.h"
 #include "glew.h"
 #include <gl/GL.h>
 
 #pragma comment (lib,"glew32.lib")
 #pragma comment (lib,"opengl32.lib")
 //#define GLEW_STATIC
-
-struct Vertex 
-{
-	float pos[3];
-	float color[4];
-};
 
 LRESULT CALLBACK GLWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
@@ -25,24 +21,7 @@ LRESULT CALLBACK GLWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam 
 		break;
 	}
 	return DefWindowProc(hwnd, msg, wParam, lParam);
-}
-
-char* LoadFileContent(const char*filePath) 
-{
-	FILE* pFile = fopen(filePath, "rb");
-	if (pFile) 
-	{
-		fseek(pFile, 0, SEEK_END);
-		int len = ftell(pFile);
-		char* buffer = new char[len+1];
-		rewind(pFile);
-		fread(buffer, len, 1, pFile);
-		buffer[len] = '\0';
-		fclose(pFile);
-		return buffer;
-	}
-	return nullptr;
-}
+} 
 
 GLuint CreateGPUProgram( const char* vsFile,const char* fsFile ) 
 {
@@ -103,7 +82,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	glewInit();
 
 	// ´´½¨GPU PROGRAM
-	GLuint program = CreateGPUProgram("sample.vs","sample.fs");
+	GLuint program = CreateGPUProgram("res/shader/sample.vs","res/shader/sample.fs");
 	GLint MLocation, VLocation, PLocation, posLocation, colorLocation;
 	MLocation = glGetUniformLocation(program, "M");
 	VLocation = glGetUniformLocation(program, "V");
@@ -111,43 +90,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	posLocation = glGetAttribLocation(program, "pos");
 	colorLocation = glGetAttribLocation(program,"color");
 
-	Vertex vertices[3];
-	vertices[0].pos[0] = 0;
-	vertices[0].pos[1] = 0;
-	vertices[0].pos[2] = -100;
-	vertices[0].color[0] = 1.0f;
-	vertices[0].color[1] = 1.0f;
-	vertices[0].color[2] = 1.0f;
-	vertices[0].color[3] = 1.0f;
+	unsigned int* indices = nullptr;
+	int indexCount = 0, vertexCount = 0;
+	VertexData* vertices = LoadObjModel("res/model/Quad.obj", &indices, indexCount, vertexCount);
 
-	vertices[1].pos[0] = 10;
-	vertices[1].pos[1] = 0;
-	vertices[1].pos[2] = -100;
-	vertices[1].color[0] = 1.0f;
-	vertices[1].color[1] = 1.0f;
-	vertices[1].color[2] = 1.0f;
-	vertices[1].color[3] = 1.0f;
-
-	vertices[2].pos[0] = 0;
-	vertices[2].pos[1] = 10;
-	vertices[2].pos[2] = -100;
-	vertices[2].color[0] = 1.0f;
-	vertices[2].color[1] = 1.0f;
-	vertices[2].color[2] = 1.0f;
-	vertices[2].color[3] = 1.0f;
-
-	GLuint vbo;
-	glGenBuffers(1,&vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * 3, vertices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER,0);
-
-	unsigned int indices[] = {0,1,2};
-	GLuint ibo;
-	glGenBuffers(1, &ibo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 3, indices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	GLuint vbo = CreateBufferObject(GL_ARRAY_BUFFER, sizeof(VertexData)*3, GL_STATIC_DRAW, vertices);
+	GLuint ibo = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 3, GL_STATIC_DRAW, indices); 
 
 	glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 	ShowWindow(hwnd, SW_SHOW);
@@ -186,9 +134,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glEnableVertexAttribArray(posLocation);
-		glVertexAttribPointer(posLocation, 3, GL_FLOAT,GL_FALSE, sizeof(Vertex),(void*)0);
+		glVertexAttribPointer(posLocation, 3, GL_FLOAT,GL_FALSE, sizeof(VertexData),(void*)0);
 		glEnableVertexAttribArray(colorLocation);
-		glVertexAttribPointer(colorLocation,4,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(sizeof(float) * 3));
+		glVertexAttribPointer(colorLocation,4,GL_FLOAT,GL_FALSE,sizeof(VertexData),(void*)(sizeof(float) * 3));
 
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
