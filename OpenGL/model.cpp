@@ -41,7 +41,7 @@ VertexData* LoadObjModel(const char* filePath, unsigned int** indices, int& inde
 					if (szOneLine[1] == 't') 
 					{
 						// texcoord
-						printf("texcoord : %s\n",szOneLine);
+						//printf("texcoord : %s\n",szOneLine);
 						ssOneLine >> temp;
 						VertexInfo texcoord;
 						ssOneLine >> texcoord.v[0];
@@ -51,7 +51,7 @@ VertexData* LoadObjModel(const char* filePath, unsigned int** indices, int& inde
 					else if (szOneLine[1] == 'n') 
 					{
 						// normal
-						printf("normal : %s\n", szOneLine);
+						//printf("normal : %s\n", szOneLine);
 						ssOneLine >> temp;
 						VertexInfo normal;
 						ssOneLine >> normal.v[0];
@@ -62,7 +62,7 @@ VertexData* LoadObjModel(const char* filePath, unsigned int** indices, int& inde
 					else
 					{
 						// vertex
-						printf("vertex : %s\n", szOneLine);
+						//printf("vertex : %s\n", szOneLine);
 						ssOneLine >> temp;
 						VertexInfo vertex;
 						ssOneLine >> vertex.v[0];
@@ -73,7 +73,7 @@ VertexData* LoadObjModel(const char* filePath, unsigned int** indices, int& inde
 				}
 				else if (szOneLine[0] == 'f')
 				{
-					printf("face : %s\n", szOneLine);
+					//printf("face : %s\n", szOneLine);
 					ssOneLine >> temp;
 					std::string indexStr;
 					for (int i = 0; i < 3; i++) 
@@ -82,8 +82,8 @@ VertexData* LoadObjModel(const char* filePath, unsigned int** indices, int& inde
 						size_t pos1 = indexStr.find_first_of('/');
 						std::string vertexIndex =  indexStr.substr(0, pos1);
 						size_t pos2 = indexStr.find_first_of('/', pos1 + 1);
-						std::string noramlIndex = indexStr.substr(pos1 +1 , pos2 - (pos1 + 1));
-						std::string texcoordIndex = indexStr.substr(pos2 + 1 ,indexStr.length() - (pos2 + 1));
+						std::string texcoordIndex = indexStr.substr(pos1 +1 , pos2 - (pos1 + 1));
+						std::string noramlIndex = indexStr.substr(pos2 + 1 ,indexStr.length() - (pos2 + 1));
 						VertexIndex index;
 						index.vertexIndex = atoi(vertexIndex.c_str());
 						index.normalIndex = atoi(noramlIndex.c_str());
@@ -112,14 +112,11 @@ VertexData* LoadObjModel(const char* filePath, unsigned int** indices, int& inde
 				}
 			}
 		}
-		indexCount = mIndices.size();
+		indexCount = (int)mIndices.size();
 		vertexCount = (int)vertices.size();
-		indices = (unsigned int**)malloc(sizeof(unsigned int));
+		*indices = new unsigned int[indexCount];
 		for (int i = 0; i < indexCount; i++)
-		{
-			//*indices[i] = (unsigned int)mIndices[i];
-			memcpy(*indices[i], &mIndices[i],sizeof(unsigned int));
-		}
+			(*indices)[i] = mIndices[i];
 		VertexData* vertexDatas = new VertexData[vertexCount];
 		for (int i = 0; i < vertexCount; i++)
 		{

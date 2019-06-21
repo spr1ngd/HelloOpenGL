@@ -83,19 +83,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	// ´´½¨GPU PROGRAM
 	GLuint program = CreateGPUProgram("res/shader/sample.vs","res/shader/sample.fs");
-	GLint MLocation, VLocation, PLocation, posLocation, colorLocation;
+	GLint MLocation, VLocation, PLocation, posLocation, normalLocation ,texcoordLocation;
 	MLocation = glGetUniformLocation(program, "M");
 	VLocation = glGetUniformLocation(program, "V");
 	PLocation = glGetUniformLocation(program, "P");
-	posLocation = glGetAttribLocation(program, "pos");
-	colorLocation = glGetAttribLocation(program,"color");
+	posLocation = glGetAttribLocation(program, "vertex");
+	normalLocation = glGetAttribLocation(program,"normal");
+	texcoordLocation = glGetAttribLocation(program,"texcoord");
 
 	unsigned int* indices = nullptr;
 	int indexCount = 0, vertexCount = 0;
-	VertexData* vertices = LoadObjModel("res/model/Quad.obj", &indices, indexCount, vertexCount);
+	VertexData* vertices = LoadObjModel("res/model/niutou.obj", &indices, indexCount, vertexCount);
 
-	GLuint vbo = CreateBufferObject(GL_ARRAY_BUFFER, sizeof(VertexData)*3, GL_STATIC_DRAW, vertices);
-	GLuint ibo = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 3, GL_STATIC_DRAW, indices); 
+	GLuint vbo = CreateBufferObject(GL_ARRAY_BUFFER, sizeof(VertexData)* vertexCount, GL_STATIC_DRAW, vertices);
+	GLuint ibo = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indexCount, GL_STATIC_DRAW, indices);
+	printf("vertex count %d,index count %d",vertexCount,indexCount);
 
 	glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 	ShowWindow(hwnd, SW_SHOW);
@@ -109,6 +111,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		0,0,0,1
 	};
 
+	float model[] = 
+	{
+		1,0,0,0,
+		0,1,0,0,
+		0,0,1,-2.0f,
+		0,0,0,1
+	};
+	glm::vec3 translate = glm::vec3(0.0f, 0.0f, -2.0f);
+	glm::mat4 modelMat = glm::translate(glm::mat4(1.0f), translate);
 	glm::mat4 projection = glm::perspective(45.0f, 800.0f/600.0f, 0.1f, 1000.0f);
 
 	MSG msg;
@@ -128,20 +139,24 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUseProgram(program);
 		
 		// TODO: set data for shader fields
-		glUniformMatrix4fv(MLocation, 1, GL_FALSE, identity);
+		glUniformMatrix4fv(MLocation, 1, GL_FALSE, glm::value_ptr(modelMat));
 		glUniformMatrix4fv(VLocation, 1, GL_FALSE, identity);
 		glUniformMatrix4fv(PLocation, 1, GL_FALSE, glm::value_ptr(projection));
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glEnableVertexAttribArray(posLocation);
 		glVertexAttribPointer(posLocation, 3, GL_FLOAT,GL_FALSE, sizeof(VertexData),(void*)0);
-		glEnableVertexAttribArray(colorLocation);
-		glVertexAttribPointer(colorLocation,4,GL_FLOAT,GL_FALSE,sizeof(VertexData),(void*)(sizeof(float) * 3));
+
+		glEnableVertexAttribArray(normalLocation);
+		glVertexAttribPointer(normalLocation,3,GL_FLOAT,GL_FALSE,sizeof(VertexData),(void*)(sizeof(float) * 3));
+
+		glEnableVertexAttribArray(texcoordLocation);
+		glVertexAttribPointer(texcoordLocation,2,GL_FLOAT,GL_FALSE,sizeof(VertexData),(void*)(sizeof(float) * 5));
 
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ibo);
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)0);
+		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 
 		glUseProgram(0);

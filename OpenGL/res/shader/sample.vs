@@ -1,5 +1,6 @@
-attribute vec3 pos;
-attribute vec4 color;
+attribute vec3 vertex;
+attribute vec3 normal;
+attribute vec2 texcoord;
 
 uniform mat4 M;
 uniform mat4 V;
@@ -9,6 +10,6 @@ varying vec4 V_Color;
 
 void main()
 {
-    V_Color = color;
-    gl_Position = P*V*M*vec4(pos,1.0);
+    V_Color = vec4(1,1,1,1);
+    gl_Position = P*V*M*vec4(vertex,1.0);
 }
