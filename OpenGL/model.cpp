@@ -1,3 +1,5 @@
+
+#include "util.h"
 #include "model.h"
 #include "misc.h"
 #include <stdio.h>

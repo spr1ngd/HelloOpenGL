@@ -43,7 +43,7 @@ void Texture::Init(const char*imagePath,bool invertY,GLenum warpMode )
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	return;
-	unsigned char* imageFileContent = LoadFileContent(imagePath);
+	unsigned char* imageFileContent = (unsigned char*)LoadFileContent(imagePath);
 	// decode image
 	int width = 0, height = 0;
 	unsigned char* pixelData = DecodeBMP(imageFileContent, width, height);

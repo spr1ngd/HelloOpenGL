@@ -1,4 +1,5 @@
 #include "misc.h"
+#include "util.h"
 #include <stdio.h>
 
 GLuint CreateBufferObject(GLenum target, GLsizeiptr size, GLenum usage,const void* data)
@@ -12,30 +13,67 @@ GLuint CreateBufferObject(GLenum target, GLsizeiptr size, GLenum usage,const voi
 
 }
 
-char* LoadFileContent(const char* filePath)
+GLuint CompileShader(GLenum shaderType, const char* shaderPath) 
 {
-	FILE* pFile = fopen(filePath, "rb");
-	if (pFile)
+	const char* shaderCode = LoadFileContent(shaderPath);
+	if (shaderCode == nullptr) 
 	{
-		fseek(pFile, 0, SEEK_END);
-		int len = ftell(pFile);
-		char* buffer = new char[len + 1];
-		rewind(pFile);
-		if (len != 0)
-		{
-			fread(buffer, len, 1, pFile);
-			buffer[len] = '\0';
-		}
-		else 
-		{
-			printf("load file %s fail len is 0",filePath);
-		}
-		fclose(pFile);
-		return buffer;
+		printf("[misc.cpp]: loadFileContent file:[%s] fail.",shaderPath);
+		return 0;
 	}
-	else
+	GLuint shader = glCreateShader(shaderType);
+	if (shader == 0)
 	{
-		printf("load file %s fail.",filePath);
-	} 
-	return nullptr;
+		printf("[misc.cpp]: glCreateShader fail.\n");
+		return 0;
+	}
+	glShaderSource(shader, 1, &shaderCode, nullptr);
+	glCompileShader(shader);
+	GLint compileResult = GL_TRUE;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &compileResult);
+	if (compileResult == GL_FALSE)
+	{
+		char szLog[1024] = { 0 };
+		GLsizei logLen = 0;
+		glGetShaderInfoLog(shader, 1024,&logLen,szLog);
+		printf("[misc.cpp]: glCompileShader shader file:[%s] fail.\n fail content :\n%s", szLog, szLog);
+		glDeleteShader(shader);
+		return 0;
+	}
+	return shader;
+}
+
+GLuint LinkGPUProgram( GLuint vsShader,GLuint fsShader ) 
+{
+	GLuint program = glCreateProgram();
+	glAttachShader(program, vsShader);
+	glAttachShader(program, fsShader);
+	glLinkProgram(program);
+	GLint linkResult = GL_TRUE;
+	glGetProgramiv(program, GL_LINK_STATUS, &linkResult);
+	if (linkResult == GL_FALSE) 
+	{
+		char szLog[1024] = { 0 };
+		GLsizei logLen = 0;
+		glGetProgramInfoLog(program, 1024, &logLen, szLog);
+		printf("[misc.cpp]: link gpu program fail. fail error : %s\n",szLog);
+		glDeleteProgram(program);
+		return 0;
+	}
+	return program;
+}
+
+
+GLuint CreateGPUProgram(const char* vsFile, const char* fsFile)
+{
+	GLuint vsShader = CompileShader(GL_VERTEX_SHADER,vsFile);
+	GLuint fsShader = CompileShader(GL_FRAGMENT_SHADER,fsFile); 
+	GLuint program = LinkGPUProgram(vsShader, fsShader);
+	if (program == 0)
+		return 0;
+	glDetachShader(program, vsShader);
+	glDetachShader(program, fsShader);
+	glDeleteShader(vsShader);
+	glDeleteShader(fsShader);
+	return program;
 }
