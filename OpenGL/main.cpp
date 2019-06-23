@@ -62,8 +62,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	wglMakeCurrent(dc,rc);
 	glewInit();
 
+	int width, height;
+	RECT rect;
+	GetClientRect(hwnd, &rect);
+	width = rect.right - rect.left;
+	height = rect.bottom - rect.top;
+
 	// ´´½¨GPU PROGRAM
-	GLuint program = CreateGPUProgram("res/shader/ui.vs","res/shader/ui.fs");
+	GLuint program = CreateGPUProgram("res/shader/sample.vs","res/shader/sample.fs");
 	if (program == 0)
 	{
 		return 0;
@@ -78,10 +84,30 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	texcoordLocation = glGetAttribLocation(program,"texcoord");
 	MainText_Location = glGetUniformLocation(program,"U_MainTexture");
 
+	/*float aspect = float(width) / (float)height;
+	float FOV = 45.0f;
+	float tanHalfFOV = tan(FOV/2.0f);
+	float x, y = 0.0f;
+	float z = 4.0f;
+	y = z * tanHalfFOV;
+	x = aspect * y;*/
+
 	unsigned int* indices = nullptr;
 	int indexCount = 0, vertexCount = 0;
 	VertexData* vertices = LoadObjModel("res/model/Quad.obj", &indices, indexCount, vertexCount);
-	Texture* texture = Texture::LoadTexture("res/texture/Í·Ïñ ÄÐº¢.png");
+	Texture* texture = Texture::LoadTexture("res/texture/timg.jpg");
+
+	/*vertices[0].position[0] = -x;
+	vertices[0].position[1] = -y;
+
+	vertices[1].position[0] = x;
+	vertices[1].position[1] = -y;
+
+	vertices[2].position[0] = -x;
+	vertices[2].position[1] = y;
+
+	vertices[3].position[0] = x;
+	vertices[3].position[1] = y;*/
 
 	GLuint vbo = CreateBufferObject(GL_ARRAY_BUFFER, sizeof(VertexData)* vertexCount, GL_STATIC_DRAW, vertices);
 	GLuint ibo = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indexCount, GL_STATIC_DRAW, indices);
@@ -89,7 +115,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 	// glClearColor(0.0f,0.0f,0.0f,1.0f);
-	glViewport(0, 0, 800, 600);
+	glViewport(0, 0, width, height);
 	glEnable(GL_DEPTH_TEST);
 	ShowWindow(hwnd, SW_SHOW);
 	UpdateWindow(hwnd);
@@ -103,10 +129,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	};
 	 
 	glm::mat4 modelMat =
-		//glm::translate(glm::mat4(1.0f), glm::vec3(-5.0f, 5.0f, 0.0f))
+		glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -4.0f));
 		//;// *glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(0.0f, 1.0f, 0.0f))
-	    /***/glm::scale(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 1.0f));
-	glm::mat4 projection = glm::perspective(45.0f, 800.0f/600.0f, 0.1f, 1000.0f);
+	    //* glm::scale(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 1.0f));
+	glm::mat4 projection = glm::perspective(45.0f, (float)width/(float)height, 0.1f, 1000.0f);
 	glm::mat4 uiMatrix = glm::ortho(-400.0f,400.0f,-300.0f,300.0f);
 	glm::mat4 normalMatrix = glm::inverseTranspose(modelMat);
 
@@ -143,7 +169,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUseProgram(program); 
 		glUniformMatrix4fv(MLocation, 1, GL_FALSE, glm::value_ptr(modelMat));
 		glUniformMatrix4fv(VLocation, 1, GL_FALSE, identity);
-		glUniformMatrix4fv(PLocation, 1, GL_FALSE, glm::value_ptr(uiMatrix));
+		glUniformMatrix4fv(PLocation, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(NMLocation,1, GL_FALSE, glm::value_ptr(normalMatrix));
 		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
 		glUniform1i(MainText_Location, 0);
@@ -167,5 +193,5 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 		SwapBuffers(dc);
 	}
-	return 0;
+	return  0;
 }
