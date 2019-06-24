@@ -41,8 +41,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	wndClass.lpszMenuName = NULL;
 	wndClass.style = CS_VREDRAW | CS_HREDRAW;
 	ATOM atom = RegisterClassEx(&wndClass);
+	RECT rect;
+	rect.left = 0.0f;
+	rect.right = 800.0f;
+	rect.top = 0.0f;
+	rect.bottom = 600.0f;
+	AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
 
-	HWND hwnd = CreateWindowEx(NULL,"OpenGL","RenderWindow",WS_OVERLAPPEDWINDOW,100,100,800,600,NULL,NULL,hInstance,NULL);
+	HWND hwnd = CreateWindowEx(NULL,"OpenGL","RenderWindow",WS_OVERLAPPEDWINDOW,100,100,rect.right-rect.left,rect.bottom-rect.top,NULL,NULL,hInstance,NULL);
 
 	HDC dc = GetDC(hwnd);
 	PIXELFORMATDESCRIPTOR pfd;
@@ -63,7 +69,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	glewInit();
 
 	int width, height;
-	RECT rect;
+
 	GetClientRect(hwnd, &rect);
 	width = rect.right - rect.left;
 	height = rect.bottom - rect.top;
@@ -84,20 +90,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	texcoordLocation = glGetAttribLocation(program,"texcoord");
 	MainText_Location = glGetUniformLocation(program,"U_MainTexture");
 
-	/*float aspect = float(width) / (float)height;
+	float aspect = float(width) / (float)height;
 	float FOV = 45.0f;
 	float tanHalfFOV = tan(FOV/2.0f);
 	float x, y = 0.0f;
 	float z = 4.0f;
 	y = z * tanHalfFOV;
-	x = aspect * y;*/
+	x = aspect * y;
 
 	unsigned int* indices = nullptr;
 	int indexCount = 0, vertexCount = 0;
 	VertexData* vertices = LoadObjModel("res/model/Quad.obj", &indices, indexCount, vertexCount);
 	Texture* texture = Texture::LoadTexture("res/texture/timg.jpg");
 
-	/*vertices[0].position[0] = -x;
+	vertices[0].position[0] = -x;
 	vertices[0].position[1] = -y;
 
 	vertices[1].position[0] = x;
@@ -107,7 +113,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	vertices[2].position[1] = y;
 
 	vertices[3].position[0] = x;
-	vertices[3].position[1] = y;*/
+	vertices[3].position[1] = y;
 
 	GLuint vbo = CreateBufferObject(GL_ARRAY_BUFFER, sizeof(VertexData)* vertexCount, GL_STATIC_DRAW, vertices);
 	GLuint ibo = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indexCount, GL_STATIC_DRAW, indices);
