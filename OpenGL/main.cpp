@@ -9,6 +9,7 @@
 #include "glew.h"
 #include <gl/GL.h>
 #include "texture.h"
+#include "timer.h"
 
 #pragma comment (lib,"glew32.lib")
 #pragma comment (lib,"opengl32.lib")
@@ -100,7 +101,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	unsigned int* indices = nullptr;
 	int indexCount = 0, vertexCount = 0;
+	Timer time;
+	time.Start();
 	VertexData* vertices = LoadObjModel("res/model/Quad.obj", &indices, indexCount, vertexCount);
+	printf("spend ticks : %d \n", time.GetPassedTicks());
+	printf("spend time : %f s\n ", time.GetPassedTime());
+	
 	Texture* texture = Texture::LoadTexture("res/texture/timg.jpg");
 
 	vertices[0].position[0] = -x;
