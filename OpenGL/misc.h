@@ -6,3 +6,6 @@ GLuint CreateBufferObject(GLenum target,GLsizeiptr size,GLenum usage, const void
 GLuint CompileShader(GLenum shaderType,const char* shaderPath);
 
 GLuint CreateGPUProgram(const char* vsFile, const char* fsFile);
+
+void CheckGLError(const char*file,int line);
+#define GL_CALL(x) do{x;CheckGLError(__FILE__,__LINE__);}while (0)

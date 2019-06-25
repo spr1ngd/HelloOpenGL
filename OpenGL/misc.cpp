@@ -77,3 +77,35 @@ GLuint CreateGPUProgram(const char* vsFile, const char* fsFile)
 	glDeleteShader(fsShader);
 	return program;
 }
+
+void CheckGLError(const char* file, int line)
+{
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR)
+	{
+		switch (error)
+		{
+		case GL_INVALID_ENUM:
+			printf("GL error GL_INVALID_ENUM %s line%d\n",file,line);
+			break;  
+		case GL_INVALID_VALUE:
+			printf("GL error GL_INVALID_VALUE %s line%d\n", file, line);
+			break;
+		case GL_INVALID_OPERATION:
+			printf("GL error GL_INVALID_OPERATION %s line%d\n", file, line);
+			break;
+		case GL_STACK_OVERFLOW:
+			printf("GL error GL_STACK_OVERFLOW %s line%d\n", file, line);
+			break;
+		case GL_STACK_UNDERFLOW:
+			printf("GL error GL_STACK_UNDERFLOW %s line%d\n", file, line);
+			break;
+		case GL_OUT_OF_MEMORY:
+			printf("GL error GL_OUT_OF_MEMORY %s line%d\n", file, line);
+			break;
+		default:
+			printf("GL error GL_ERROR 0x%x\n",error);
+			break;
+		}
+	}
+}

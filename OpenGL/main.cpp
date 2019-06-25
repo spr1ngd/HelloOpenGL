@@ -69,6 +69,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	wglMakeCurrent(dc,rc);
 	glewInit();
 
+	GL_CALL(glEnable(GL_LINEAR));
+
 	int width, height;
 
 	GetClientRect(hwnd, &rect);

@@ -23,12 +23,14 @@
     <ClCompile Include="misc.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="texture.cpp" />
+    <ClCompile Include="timer.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="misc.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="texture.h" />
+    <ClInclude Include="timer.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
   <ItemGroup>
