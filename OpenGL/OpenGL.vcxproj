@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="frustum.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="misc.cpp" />
     <ClCompile Include="model.cpp" />
@@ -27,6 +28,7 @@
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="frustum.h" />
     <ClInclude Include="misc.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="texture.h" />

@@ -10,6 +10,7 @@
 #include <gl/GL.h>
 #include "texture.h"
 #include "timer.h"
+#include "frustum.h"
 
 #pragma comment (lib,"glew32.lib")
 #pragma comment (lib,"opengl32.lib")
@@ -69,7 +70,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	wglMakeCurrent(dc,rc);
 	glewInit();
 
-	GL_CALL(glEnable(GL_LINEAR));
+	//GL_CALL(glEnable(GL_LINEAR));
 
 	int width, height;
 
@@ -77,8 +78,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	width = rect.right - rect.left;
 	height = rect.bottom - rect.top;
 
+
 	// ´´½¨GPU PROGRAM
-	GLuint program = CreateGPUProgram("res/shader/sample.vs","res/shader/sample.fs");
+	GLuint program = CreateGPUProgram("res/shader/pointsprite.vs","res/shader/pointsprite.fs");
+	//GLuint program = CreateGPUProgram("res/shader/sample.vs", "res/shader/sample.fs");
 	if (program == 0)
 	{
 		return 0;
@@ -106,12 +109,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	Timer time;
 	time.Start();
 	VertexData* vertices = LoadObjModel("res/model/Quad.obj", &indices, indexCount, vertexCount);
-	printf("spend ticks : %d \n", time.GetPassedTicks());
-	printf("spend time : %f s\n ", time.GetPassedTime());
-	
-	Texture* texture = Texture::LoadTexture("res/texture/timg.jpg");
+	Texture* texture = Texture::LoadTexture("res/texture/camera.png");
 
-	vertices[0].position[0] = -x;
+	/*vertices[0].position[0] = -x;
 	vertices[0].position[1] = -y;
 
 	vertices[1].position[0] = x;
@@ -121,7 +121,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	vertices[2].position[1] = y;
 
 	vertices[3].position[0] = x;
-	vertices[3].position[1] = y;
+	vertices[3].position[1] = y;*/
+	vertices[0].position[0] = 0.0f;
+	vertices[0].position[1] = 0.0f;
 
 	GLuint vbo = CreateBufferObject(GL_ARRAY_BUFFER, sizeof(VertexData)* vertexCount, GL_STATIC_DRAW, vertices);
 	GLuint ibo = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indexCount, GL_STATIC_DRAW, indices);
@@ -150,6 +152,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	glm::mat4 uiMatrix = glm::ortho(-400.0f,400.0f,-300.0f,300.0f);
 	glm::mat4 normalMatrix = glm::inverseTranspose(modelMat);
 
+
+	Frustum frustum;
+	frustum.InitProgram();
+	frustum.InitPerspective(45.0f, (float)width / (float)height, 0.1, 1000.0f);
+
+	glEnable(GL_POINT_SPRITE);
+	glEnable(GL_PROGRAM_POINT_SIZE);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA );
@@ -180,6 +189,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
+		frustum.Draw(glm::value_ptr(modelMat), identity,glm::value_ptr(projection));
+
 		glUseProgram(program); 
 		glUniformMatrix4fv(MLocation, 1, GL_FALSE, glm::value_ptr(modelMat));
 		glUniformMatrix4fv(VLocation, 1, GL_FALSE, identity);
@@ -200,9 +211,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		  
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ibo);
-		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
+		//glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
+		glDrawElements(GL_POINTS,1,GL_UNSIGNED_INT,(void*)0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
-
 		glUseProgram(0);
 
 		SwapBuffers(dc);
