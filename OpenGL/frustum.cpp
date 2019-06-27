@@ -61,7 +61,7 @@ void Frustum::Draw( float*model,float*view,float*projection )
 	glBindBuffer(GL_ARRAY_BUFFER,0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,mIBO);
-	glDrawElements(GL_LINE,24,GL_UNSIGNED_INT,(void*)0);
+	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,(void*)0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 	glUseProgram(0);
 }

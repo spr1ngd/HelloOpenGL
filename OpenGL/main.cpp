@@ -79,7 +79,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	height = rect.bottom - rect.top;
 
 
-	// ´´½¨GPU PROGRAM
+	// ï¿½ï¿½ï¿½ï¿½GPU PROGRAM
 	GLuint program = CreateGPUProgram("res/shader/pointsprite.vs","res/shader/pointsprite.fs");
 	//GLuint program = CreateGPUProgram("res/shader/sample.vs", "res/shader/sample.fs");
 	if (program == 0)
@@ -109,19 +109,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	Timer time;
 	time.Start();
 	VertexData* vertices = LoadObjModel("res/model/Quad.obj", &indices, indexCount, vertexCount);
-	Texture* texture = Texture::LoadTexture("res/texture/camera.png");
-
-	/*vertices[0].position[0] = -x;
-	vertices[0].position[1] = -y;
-
-	vertices[1].position[0] = x;
-	vertices[1].position[1] = -y;
-
-	vertices[2].position[0] = -x;
-	vertices[2].position[1] = y;
-
-	vertices[3].position[0] = x;
-	vertices[3].position[1] = y;*/
+	Texture* texture = Texture::LoadTexture("res/texture/camera.png"); 
 	vertices[0].position[0] = 0.0f;
 	vertices[0].position[1] = 0.0f;
 
@@ -175,16 +163,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			}
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
-		}
-
-		/*angle += 0.005f;
-		if (angle >= 3.1415926f*2)
-			angle -= 3.1415926f*2; 
-
-		modelMat =
-			glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f)) *
-			glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
-		normalMatrix = glm::inverseTranspose(modelMat);*/
+		} 
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
