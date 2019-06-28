@@ -17,6 +17,13 @@ void Frustum::InitProgram()
 
 void Frustum::InitPerspective(float fov,float aspect,float zNear,float zFar) 
 {
+	/*float FOV = 45.0f;
+	float tanHalfFOV = tan(FOV / 2.0f);
+	float x, y = 0.0f;
+	float z = 4.0f;
+	y = z * tanHalfFOV;
+	x = aspect * y;*/
+
 	// NEAR
 	float nearX = 0.0f;
 	float nearY = 0.0f;
@@ -25,8 +32,8 @@ void Frustum::InitPerspective(float fov,float aspect,float zNear,float zFar)
 	nearX = aspect * nearY;
 
 	// FAR
-	float farX = tanHalfFOV * zFar;
-	float farY = aspect * farX;
+	float farY = tanHalfFOV * zFar;
+	float farX = aspect * farY;
 	float vertices[] =
 	{
 		-nearX,-nearY,-zNear,
@@ -37,15 +44,24 @@ void Frustum::InitPerspective(float fov,float aspect,float zNear,float zFar)
 		farX,-farY,-zFar,
 		farX,farY,-zFar,
 		-farX,farY,-zFar,
+	/*	-10.0f,-10.0f,0.0f,
+		10.0f,-10.0f,0.0f,
+		10.0f,10.0f,0.0f,
+		-10.0f,10.0f,0.0f,
+
+		-30.0f,-30.0f,-5.0f,
+		30.0f,-30.0f,-5.0f,
+		30.0f,30.0f,-5.0f,
+		-30.0f,30.0f,-5.0f,*/
 	};
-	mVBO = CreateBufferObject(GL_ARRAY_BUFFER, 24, GL_STATIC_DRAW, vertices);
+	mVBO = CreateBufferObject(GL_ARRAY_BUFFER, sizeof(float)*24, GL_STATIC_DRAW, vertices);
 	unsigned int indices[] = 
 	{
 		0,1,1,2,2,3,3,0,
 		4,5,5,6,6,7,7,4,
 		0,4,1,5,2,6,3,7
 	};
-	mIBO = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, 24, GL_STATIC_DRAW, indices);
+	mIBO = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, sizeof(int)*24, GL_STATIC_DRAW, indices);
 }
 
 void Frustum::Draw( float*model,float*view,float*projection )   
@@ -57,11 +73,12 @@ void Frustum::Draw( float*model,float*view,float*projection )
 	
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
 	glEnableVertexAttribArray(mVertexLocation);
-	glVertexAttribPointer(mVertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+	glVertexAttribPointer(mVertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3,0);
 	glBindBuffer(GL_ARRAY_BUFFER,0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,mIBO);
-	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,(void*)0);
+	glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,0);
+	//glDrawElements(GL_POINTS,8,GL_UNSIGNED_INT,(void*)0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 	glUseProgram(0);
 }

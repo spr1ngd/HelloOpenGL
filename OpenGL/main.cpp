@@ -44,10 +44,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	wndClass.style = CS_VREDRAW | CS_HREDRAW;
 	ATOM atom = RegisterClassEx(&wndClass);
 	RECT rect;
-	rect.left = 0.0f;
-	rect.right = 800.0f;
-	rect.top = 0.0f;
-	rect.bottom = 600.0f;
+	rect.left = (long)0.0;
+	rect.right = (long)800.0;
+	rect.top = (long)0.0;
+	rect.bottom = (long)600.0;
 	AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
 
 	HWND hwnd = CreateWindowEx(NULL,"OpenGL","RenderWindow",WS_OVERLAPPEDWINDOW,100,100,rect.right-rect.left,rect.bottom-rect.top,NULL,NULL,hInstance,NULL);
@@ -79,7 +79,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	height = rect.bottom - rect.top;
 
 
-	// ï¿½ï¿½ï¿½ï¿½GPU PROGRAM
+	// ´´½¨GPU PROGRAM
 	GLuint program = CreateGPUProgram("res/shader/pointsprite.vs","res/shader/pointsprite.fs");
 	//GLuint program = CreateGPUProgram("res/shader/sample.vs", "res/shader/sample.fs");
 	if (program == 0)
@@ -109,7 +109,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	Timer time;
 	time.Start();
 	VertexData* vertices = LoadObjModel("res/model/Quad.obj", &indices, indexCount, vertexCount);
-	Texture* texture = Texture::LoadTexture("res/texture/camera.png"); 
+	Texture* texture = Texture::LoadTexture("res/texture/camera.png");
+
+	/*vertices[0].position[0] = -x;
+	vertices[0].position[1] = -y;
+
+	vertices[1].position[0] = x;
+	vertices[1].position[1] = -y;
+
+	vertices[2].position[0] = -x;
+	vertices[2].position[1] = y;
+
+	vertices[3].position[0] = x;
+	vertices[3].position[1] = y;*/
 	vertices[0].position[0] = 0.0f;
 	vertices[0].position[1] = 0.0f;
 
@@ -133,9 +145,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	};
 	 
 	glm::mat4 modelMat =
-		glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -4.0f));
-		//;// *glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(0.0f, 1.0f, 0.0f))
-	    //* glm::scale(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 1.0f));
+		glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -50.0f))
+		* glm::rotate(glm::mat4(1.0f), -60.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	    //* glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 1.00f));
 	glm::mat4 projection = glm::perspective(45.0f, (float)width/(float)height, 0.1f, 1000.0f);
 	glm::mat4 uiMatrix = glm::ortho(-400.0f,400.0f,-300.0f,300.0f);
 	glm::mat4 normalMatrix = glm::inverseTranspose(modelMat);
@@ -143,7 +155,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	Frustum frustum;
 	frustum.InitProgram();
-	frustum.InitPerspective(45.0f, (float)width / (float)height, 0.1, 1000.0f);
+	frustum.InitPerspective(45.0f, (float)width / (float)height, 1, 20.0f);
 
 	glEnable(GL_POINT_SPRITE);
 	glEnable(GL_PROGRAM_POINT_SIZE);
@@ -163,7 +175,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			}
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
-		} 
+		}
+
+		/*angle += 0.005f;
+		if (angle >= 3.1415926f*2)
+			angle -= 3.1415926f*2; 
+
+		modelMat =
+			glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f)) *
+			glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
+		normalMatrix = glm::inverseTranspose(modelMat);*/
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
