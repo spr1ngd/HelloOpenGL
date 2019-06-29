@@ -16,14 +16,7 @@ void Frustum::InitProgram()
 }
 
 void Frustum::InitPerspective(float fov,float aspect,float zNear,float zFar) 
-{
-	/*float FOV = 45.0f;
-	float tanHalfFOV = tan(FOV / 2.0f);
-	float x, y = 0.0f;
-	float z = 4.0f;
-	y = z * tanHalfFOV;
-	x = aspect * y;*/
-
+{  
 	// NEAR
 	float nearX = 0.0f;
 	float nearY = 0.0f;
@@ -43,16 +36,7 @@ void Frustum::InitPerspective(float fov,float aspect,float zNear,float zFar)
 		-farX,-farY,-zFar,
 		farX,-farY,-zFar,
 		farX,farY,-zFar,
-		-farX,farY,-zFar,
-	/*	-10.0f,-10.0f,0.0f,
-		10.0f,-10.0f,0.0f,
-		10.0f,10.0f,0.0f,
-		-10.0f,10.0f,0.0f,
-
-		-30.0f,-30.0f,-5.0f,
-		30.0f,-30.0f,-5.0f,
-		30.0f,30.0f,-5.0f,
-		-30.0f,30.0f,-5.0f,*/
+		-farX,farY,-zFar, 
 	};
 	mVBO = CreateBufferObject(GL_ARRAY_BUFFER, sizeof(float)*24, GL_STATIC_DRAW, vertices);
 	unsigned int indices[] = 
@@ -62,6 +46,30 @@ void Frustum::InitPerspective(float fov,float aspect,float zNear,float zFar)
 		0,4,1,5,2,6,3,7
 	};
 	mIBO = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, sizeof(int)*24, GL_STATIC_DRAW, indices);
+}
+
+void Frustum::InitOrtho( float left,float right,float top,float bottom,float zNear,float zFar ) 
+{  
+	float vertices[] =
+	{
+		left,bottom,-zNear,
+		right,bottom,-zNear,
+		right,top,-zNear,
+		left,top,-zNear,
+
+		left,bottom,-zFar,
+		right,bottom,-zFar,
+		right,top,-zFar,
+		left,top,-zFar,
+	};
+	mVBO = CreateBufferObject(GL_ARRAY_BUFFER, sizeof(float) * 24, GL_STATIC_DRAW, vertices);
+	unsigned int indices[] =
+	{
+		0,1,1,2,2,3,3,0,
+		4,5,5,6,6,7,7,4,
+		0,4,1,5,2,6,3,7
+	};
+	mIBO = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * 24, GL_STATIC_DRAW, indices);
 }
 
 void Frustum::Draw( float*model,float*view,float*projection )   

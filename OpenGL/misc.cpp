@@ -10,7 +10,52 @@ GLuint CreateBufferObject(GLenum target, GLsizeiptr size, GLenum usage,const voi
 	glBufferData(target, size, data, usage);
 	glBindBuffer(target, 0);
 	return object;
+}
 
+GLuint CreateVAO( std::function<void()> setting) 
+{
+	GLuint vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+	setting();
+	glBindVertexArray(0);
+	return vao;
+}
+
+GLuint CreateFrameBufferObject( GLuint&colorBuffer,GLuint&depthBuffer,int width,int height )
+{
+	GLuint fbo;
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	// color buffer
+	glGenTextures(1, &colorBuffer);
+	
+	glBindTexture(GL_TEXTURE_2D, colorBuffer);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glBindTexture(GL_TEXTURE_2D,0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorBuffer, 0);
+	// depth buffer
+	glGenTextures(1,&depthBuffer);
+	glBindTexture(GL_TEXTURE_2D, depthBuffer); 
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexImage2D(GL_TEXTURE_2D,0,GL_DEPTH24_STENCIL8,width,height,0, GL_DEPTH_STENCIL,GL_UNSIGNED_INT_24_8,NULL);
+	glBindTexture(GL_TEXTURE_2D,0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthBuffer, 0);
+
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
+		printf("create framebuffer object fail.\n");
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER,0);
+	return fbo;
 }
 
 GLuint CompileShader(GLenum shaderType, const char* shaderPath) 
@@ -24,7 +69,6 @@ GLuint CompileShader(GLenum shaderType, const char* shaderPath)
 	GLuint shader = glCreateShader(shaderType);
 	if (shader == 0)
 	{
-		printf("[misc.cpp]: glCreateShader fail.\n");
 		return 0;
 	}
 	glShaderSource(shader, 1, &shaderCode, nullptr);
@@ -36,7 +80,7 @@ GLuint CompileShader(GLenum shaderType, const char* shaderPath)
 		char szLog[1024] = { 0 };
 		GLsizei logLen = 0;
 		glGetShaderInfoLog(shader, 1024,&logLen,szLog);
-		printf("[misc.cpp]: glCompileShader shader file:[%s] fail.\n fail content :\n%s", szLog, szLog);
+		printf("[misc.cpp]: glCompileShader shader file:[%s] fail.\n fail content :\n%s", shaderPath, szLog);
 		glDeleteShader(shader);
 		return 0;
 	}
