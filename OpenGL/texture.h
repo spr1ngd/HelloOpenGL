@@ -11,8 +11,8 @@ class Texture
 public:
 	GLuint mTextureID; // gpu
 	std::string mPath;
-	void Init(const char*imagePath, bool invertY, GLenum warpMode = GL_CLAMP_TO_EDGE);
-	static Texture* LoadTexture(const char*imagePath,bool invertY = true,GLenum warpMode = GL_CLAMP_TO_EDGE);
+	void Init(const char*imagePath, bool invertY, GLenum warpMode = GL_CLAMP_TO_EDGE,bool isSubImage = false);
+	static Texture* LoadTexture(const char*imagePath,bool invertY = true,GLenum warpMode = GL_CLAMP_TO_EDGE,bool isSubImage = false);
 	static void UnLoadTexture(Texture* texture);
 	static std::unordered_map<std::string, Texture*> mCachedTextures;
 };

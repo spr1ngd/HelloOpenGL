@@ -105,8 +105,7 @@ GLuint LinkGPUProgram( GLuint vsShader,GLuint fsShader )
 		return 0;
 	}
 	return program;
-}
-
+} 
 
 GLuint CreateGPUProgram(const char* vsFile, const char* fsFile)
 {
@@ -119,6 +118,27 @@ GLuint CreateGPUProgram(const char* vsFile, const char* fsFile)
 	glDetachShader(program, fsShader);
 	glDeleteShader(vsShader);
 	glDeleteShader(fsShader);
+	return program;
+}
+
+GLuint CreateComputerShaderProgram( const char* computerShaderFile )  
+{
+	GLuint csShader = CompileShader(GL_COMPUTE_SHADER, computerShaderFile);
+	GLuint program = glCreateProgram();
+	glAttachShader(program, csShader);
+	glLinkProgram(program);
+	GLint linkResult = GL_TRUE;
+	glGetProgramiv(program,GL_LINK_STATUS,&linkResult);
+	if (linkResult == GL_FALSE)
+	{
+		char szLog[1024]{0};
+		GLsizei logLen = 0;
+		glGetProgramInfoLog(program, 10224, &logLen, szLog);
+		printf("[misc.cpp]: link gpu program fail. fail error : %s\n", szLog);
+		glDeleteProgram(program);
+	}
+	glDetachShader(program, csShader);
+	glDeleteShader(csShader);
 	return program;
 }
 

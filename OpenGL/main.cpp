@@ -238,6 +238,24 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 
+	// Use computer shader to inverse image color 
+	GLuint csProgram = CreateComputerShaderProgram("res/shader/inverse_color.shader");
+	GLuint computerDstTexture;
+	glGenTextures(1, &computerDstTexture);
+	glBindTexture(GL_TEXTURE_2D, computerDstTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexStorage2D(GL_TEXTURE_2D,1, GL_RGBA8, 512, 512);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	Texture* srcTexture = Texture::LoadTexture("res/texture/timg.jpg",true);
+	glUseProgram(csProgram);
+	glBindImageTexture(0, srcTexture->mTextureID, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
+	glBindImageTexture(1, computerDstTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+	glDispatchCompute(512 / 16, 512 / 16, 1);
+
 	auto wath = [&](void)
 	{
 		//frustum.Draw(glm::value_ptr(modelMat), identity,glm::value_ptr(projection));
@@ -246,7 +264,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUniformMatrix4fv(VLocation, 1, GL_FALSE, identity);
 		glUniformMatrix4fv(PLocation, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(NMLocation, 1, GL_FALSE, glm::value_ptr(normalMatrix));
-		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
+		glBindTexture(GL_TEXTURE_2D, computerDstTexture); //srcTexture->mTextureID
 		glUniform1i(MainText_Location, 0);
 
 		glBindVertexArray(vao); 

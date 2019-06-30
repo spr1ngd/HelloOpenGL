@@ -28,7 +28,7 @@ unsigned char* DecodeBMP( unsigned char*bmpFileData ,int&width,int&height)
 	}
 } 
 
-void Texture::Init(const char*imagePath,bool invertY,GLenum warpMode ) 
+void Texture::Init(const char*imagePath,bool invertY,GLenum warpMode ,bool isSubImage) 
 {
 	unsigned int flags = SOIL_FLAG_POWER_OF_TWO;
 	if (invertY)
@@ -57,13 +57,20 @@ void Texture::Init(const char*imagePath,bool invertY,GLenum warpMode )
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, /*GL_CLAMP*/GL_REPEAT);
 	
 	// 
-	glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,0,GL_RGB,GL_UNSIGNED_BYTE,pixelData);
+	if (isSubImage)
+	{
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixelData);
+	}
+	else
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, pixelData);
+	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 	delete imageFileContent;
 }
 
 std::unordered_map<std::string, Texture*> Texture::mCachedTextures;
-Texture* Texture::LoadTexture( const char*imagePath ,bool invertY ,GLenum warpMode )   
+Texture* Texture::LoadTexture( const char*imagePath ,bool invertY ,GLenum warpMode ,bool isSubImage )   
 {
 	if (mCachedTextures.find(imagePath) != mCachedTextures.end())
 	{
