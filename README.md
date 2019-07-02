@@ -1,4 +1,10 @@
 
+# Fixed Pipelines
+
+    - 未更新
+
+# Programmable Pipelines
+
 ## Finished Feature
 
     - VBO
@@ -23,3 +29,11 @@
 
     - MSAA(multi-sample Anti-aliasing):Unkown reason , it does not work on my win7 pc.
     - Compute Shader : calculate inverse color for texture2D has bug, all pixel are in black.
+
+# Shading Lanuage 
+
+## Finished Features
+
+    - attribute : vertex shader exclusively.(number limit OpenGL2.0 **8**)
+    - uniform : use in all type shader.(number limit OpenGL2.0 **128**)
+    - varying : property delivery (number limit OpenGL2.0 **8**)

@@ -11,3 +11,4 @@ OpenGL/OpenGL.vcxproj
 *.vcxproj
 OpenGL/OpenGL.vcxproj
 OpenGL/OpenGL.vcxproj.filters
+Shading/Shading.vcxproj.filters

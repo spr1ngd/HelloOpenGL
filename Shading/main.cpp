@@ -1,9 +1,14 @@
 
 #include <windows.h>
 #include <stdio.h> 
+#include "Glm/glm.hpp"
+#include "Glm/ext.hpp"
 #include "glew.h"
 #include "wglew.h"
-#include <gl/GL.h> 
+#include <gl/GL.h>
+#include "misc.h"
+#include "model.h"
+#include "texture.h"
 
 #pragma comment (lib,"glew32.lib")
 #pragma comment (lib,"opengl32.lib")
@@ -69,10 +74,68 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	width = rect.right - rect.left;
 	height = rect.bottom - rect.top;
 
+	// create GPU program
+	GLuint program = CreateGPUProgram("res/shader/diffuse.vs", "res/shader/diffuse.fs");
+	GLuint MLocation, VLocation, PLocation,NMLocation, vertexLocation, normalLocation, texcoordLocation,MainTextureLocation;
+	vertexLocation = glGetAttribLocation(program, "vertex");
+	normalLocation = glGetAttribLocation(program, "normal");
+	texcoordLocation = glGetAttribLocation(program,"texcoord");
+	MLocation = glGetUniformLocation(program, "M");
+	VLocation = glGetUniformLocation(program, "V");
+	PLocation = glGetUniformLocation(program,"P");
+	NMLocation = glGetUniformLocation(program, "NM");
+	MainTextureLocation = glGetUniformLocation(program,"U_MainTexture");
+
+	// load cube model
+	unsigned int* indices = nullptr;
+	int indexCount, vertexCount;
+	VertexData* vertices = LoadObjModel("res/model/cube.obj", &indices, indexCount, vertexCount);
+	Texture* texture = Texture::LoadTexture("res/texture/test.bmp");
+
+	GLuint vao = CreateVAO([&]()
+	{
+		GLuint vbo = CreateBufferObject(GL_ARRAY_BUFFER, sizeof(VertexData) * vertexCount, GL_STATIC_DRAW, vertices);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glEnableVertexAttribArray(vertexLocation);
+		glVertexAttribPointer(vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)0);
+		glEnableVertexAttribArray(normalLocation);
+		glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 3));
+		glEnableVertexAttribArray(texcoordLocation);
+		glVertexAttribPointer(texcoordLocation, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 6));
+		glBindBuffer(GL_ARRAY_BUFFER,0);
+	});
+	GLuint ibo = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER,sizeof(unsigned int)*indexCount,GL_STATIC_DRAW,indices);
+
 	glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 	glViewport(0, 0, width, height);
 	ShowWindow(hwnd, SW_SHOW);
-	UpdateWindow(hwnd);
+	UpdateWindow(hwnd); 
+
+	glm::mat4 MODEL = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -4.0f)) * glm::rotate(glm::mat4(1.0f),60.0f,glm::vec3(0.0f,1.0f,0.0f));
+	glm::mat4 PROJECTION = glm::perspective(45.0f, float(width) / (float)height, 0.1f, 200.0f);
+	glm::mat4 ORTHO = glm::ortho(-400.0f, 400.0f, -300.0f, 300.0f);
+	glm::mat4 VIEW = glm::mat4(1.0f);
+	glm::mat4 NM = glm::inverseTranspose(MODEL);
+
+	auto render = [&](void)
+	{
+		glUseProgram(program);
+		glUniformMatrix4fv(MLocation, 1, GL_FALSE, glm::value_ptr(MODEL));
+		glUniformMatrix4fv(VLocation, 1, GL_FALSE, glm::value_ptr(VIEW));
+		glUniformMatrix4fv(PLocation, 1, GL_FALSE, glm::value_ptr(PROJECTION));
+		glUniformMatrix4fv(NMLocation, 1, GL_FALSE, glm::value_ptr(NM));
+		
+		// bind texture
+		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
+		glUniform1i(MainTextureLocation, 0);
+
+		// bind ibo
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ibo);
+		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
+		glBindVertexArray(0);
+		glUseProgram(0);
+	};
 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
@@ -89,6 +152,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			DispatchMessage(&msg);
 		}
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		render();
 		SwapBuffers(dc);
 	}
 	return  0;

@@ -184,6 +184,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glEnableVertexAttribArray(texcoordLocation);
 		glVertexAttribPointer(texcoordLocation, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 6));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 		glBindBuffer(GL_ARRAY_BUFFER, offsetVBO);
 		glEnableVertexAttribArray(offsetLocation);
 		glVertexAttribPointer(offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
