@@ -76,7 +76,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	// create GPU program
 	GLuint program = CreateGPUProgram("res/shader/diffuse.vs", "res/shader/diffuse.fs");
-	GLuint MLocation, VLocation, PLocation,NMLocation, vertexLocation, normalLocation, texcoordLocation,MainTextureLocation;
+	GLuint MLocation, VLocation, PLocation,NMLocation, vertexLocation, normalLocation, texcoordLocation,MainTextureLocation,SecondTextureLocation;
 	vertexLocation = glGetAttribLocation(program, "vertex");
 	normalLocation = glGetAttribLocation(program, "normal");
 	texcoordLocation = glGetAttribLocation(program,"texcoord");
@@ -85,12 +85,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	PLocation = glGetUniformLocation(program,"P");
 	NMLocation = glGetUniformLocation(program, "NM");
 	MainTextureLocation = glGetUniformLocation(program,"U_MainTexture");
+	SecondTextureLocation = glGetUniformLocation(program,"U_SecondTexture");
 
 	// load cube model
 	unsigned int* indices = nullptr;
 	int indexCount, vertexCount;
 	VertexData* vertices = LoadObjModel("res/model/cube.obj", &indices, indexCount, vertexCount);
-	Texture* texture = Texture::LoadTexture("res/texture/test.bmp");
+	Texture* texture = Texture::LoadTexture("res/texture/fur.jpg");
+	Texture* secondTex = Texture::LoadTexture("res/texture/carbon_fiber.jpg");
 
 	GLuint vao = CreateVAO([&]()
 	{
@@ -126,8 +128,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUniformMatrix4fv(NMLocation, 1, GL_FALSE, glm::value_ptr(NM));
 		
 		// bind texture
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
 		glUniform1i(MainTextureLocation, 0);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D,secondTex->mTextureID) ;
+		glUniform1i(SecondTextureLocation,1);
 
 		// bind ibo
 		glBindVertexArray(vao);

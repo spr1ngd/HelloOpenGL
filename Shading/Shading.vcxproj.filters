@@ -30,6 +30,9 @@
     <ClCompile Include="model.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="FBO.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\OpenGL\texture.h">
@@ -45,6 +48,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="main.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FBO.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

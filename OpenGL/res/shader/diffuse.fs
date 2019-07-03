@@ -1,4 +1,5 @@
 uniform sampler2D U_MainTexture;
+uniform sampler2D U_SecondTexture;
 varying vec3 V_Normal;
 varying vec4 V_WorldPos;
 varying vec2 V_Texcoord; 
@@ -19,5 +20,6 @@ void main()
     // diffuse
     vec4 diffuseColor = vec4(1.0, 1.0, 1.0, 1.0);
     vec4 diffuse = diffuseColor * lightColor * max(0.0,dot(L,N));
-    gl_FragColor = diffuse * texture2D(U_MainTexture,V_Texcoord);
+    // gl_FragColor = diffuse * texture2D(U_MainTexture,V_Texcoord);
+    gl_FragColor = texture2D(U_MainTexture,V_Texcoord) * texture2D(U_SecondTexture,V_Texcoord);
 }
