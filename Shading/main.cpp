@@ -8,7 +8,10 @@
 #include <gl/GL.h>
 #include "misc.h"
 #include "model.h"
+#include "fbo.h"
 #include "texture.h"
+#include "fullscreenquad.h"
+#include "gpuprogram.h"
 
 #pragma comment (lib,"glew32.lib")
 #pragma comment (lib,"opengl32.lib")
@@ -94,6 +97,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	Texture* texture = Texture::LoadTexture("res/texture/fur.jpg");
 	Texture* secondTex = Texture::LoadTexture("res/texture/carbon_fiber.jpg");
 
+	GPUProgram fsProgram; 
+
+	FullScreenQuad fullscreen;
+	fullscreen.Init();
+	
+
+	FBO fbo;
+	fbo.AttachColorBuffer("color", GL_COLOR_ATTACHMENT0, GL_RGBA, 256, 256);
+	fbo.AttachDepthBuffer("depth",256,256);
+	fbo.Finish();
+
 	GLuint vao = CreateVAO([&]()
 	{
 		GLuint vbo = CreateBufferObject(GL_ARRAY_BUFFER, sizeof(VertexData) * vertexCount, GL_STATIC_DRAW, vertices);
@@ -129,11 +143,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		
 		// bind texture
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
+		//glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
+		glBindTexture(GL_TEXTURE_2D,fbo.GetBuffer("color"));
 		glUniform1i(MainTextureLocation, 0);
 
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D,secondTex->mTextureID) ;
+		glBindTexture(GL_TEXTURE_2D, secondTex->mTextureID) ;
+		//glBindTexture(GL_TEXTURE_2D,fbo.GetBuffer("color"));
 		glUniform1i(SecondTextureLocation,1);
 
 		// bind ibo
@@ -158,6 +174,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+		//glBindFramebuffer(GL_FRAMEBUFFER, fbo.mFBO);
+		fbo.Bind();
+		glClearColor(1.0f, 1.0f, 1.0f,1.0f);
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		//glBindFramebuffer(GL_FRAMEBUFFER,0);
+		fbo.Unbind();
+
+		glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		render();
 		SwapBuffers(dc);
