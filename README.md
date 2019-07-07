@@ -37,3 +37,4 @@
     - attribute : vertex shader exclusively.(number limit OpenGL2.0 **8**)
     - uniform : use in all type shader.(number limit OpenGL2.0 **128**)
     - varying : property delivery (number limit OpenGL2.0 **8**)
+    - fbo : frame buffer objcet.
