@@ -14,6 +14,7 @@ public:
 	GLuint mProgram;
 public:
 	void AttachShader(GLenum shaderType,const char*shaderFile);
+	void LinkProgram();
 	void DetectAttribute(const char*attName);
 	void DetectUniform(const char*uniformName);
 };

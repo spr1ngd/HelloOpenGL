@@ -100,8 +100,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	GPUProgram fsProgram; 
 
 	FullScreenQuad fullscreen;
-	fullscreen.Init();
-	
+	fullscreen.Init(); 
 
 	FBO fbo;
 	fbo.AttachColorBuffer("color", GL_COLOR_ATTACHMENT0, GL_RGBA, 256, 256);

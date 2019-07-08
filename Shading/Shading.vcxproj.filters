@@ -33,6 +33,12 @@
     <ClCompile Include="FBO.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="GPUProgram.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FullScreenQuad.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\OpenGL\texture.h">
@@ -51,6 +57,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="FBO.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GPUProgram.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FullScreenQuad.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

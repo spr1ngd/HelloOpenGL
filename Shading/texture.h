@@ -4,7 +4,7 @@
 #include <string>
 #include <unordered_map>
 
-#define GL_CLAMP_TO_EDGE 0x812f
+//#define GL_CLAMP_TO_EDGE 0x812f
 
 class Texture
 {
