@@ -15,11 +15,11 @@ void FullScreenQuad::Init()
 	glBindBuffer(GL_ARRAY_BUFFER,0);
 }
 
-void FullScreenQuad::Draw(GLuint posLocation) 
+void FullScreenQuad::Draw(GLuint posLocation,GLuint texcoordLocation)
 {
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
+	//glBindBuffer(GL_ARRAY_BUFFER, mVBO);
 	glEnableVertexAttribArray(posLocation);
 	glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
 	glDrawArrays(GL_QUADS, 0, 4);
-	glBindBuffer(GL_ARRAY_BUFFER,0);
+	//glBindBuffer(GL_ARRAY_BUFFER,0);
 }

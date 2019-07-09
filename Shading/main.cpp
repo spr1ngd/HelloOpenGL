@@ -98,6 +98,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	Texture* secondTex = Texture::LoadTexture("res/texture/carbon_fiber.jpg");
 
 	GPUProgram fsProgram; 
+	fsProgram.AttachShader(GL_VERTEX_SHADER, "res/shader/fullscreen.vs");
+	fsProgram.AttachShader(GL_FRAGMENT_SHADER,"res/shader/fullscreen.fs");
+	fsProgram.LinkProgram();
+	GLuint ffffss = CreateGPUProgram("res/shader/fullscreen.vs", "res/shader/fullscreen.fs");
 
 	FullScreenQuad fullscreen;
 	fullscreen.Init(); 
@@ -116,7 +120,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glEnableVertexAttribArray(normalLocation);
 		glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 3));
 		glEnableVertexAttribArray(texcoordLocation);
-		glVertexAttribPointer(texcoordLocation, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 6));
+		glVertexAttribPointer(texcoordLocation,2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 6));
 		glBindBuffer(GL_ARRAY_BUFFER,0);
 	});
 	GLuint ibo = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER,sizeof(unsigned int)*indexCount,GL_STATIC_DRAW,indices);
@@ -138,7 +142,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUniformMatrix4fv(MLocation, 1, GL_FALSE, glm::value_ptr(MODEL));
 		glUniformMatrix4fv(VLocation, 1, GL_FALSE, glm::value_ptr(VIEW));
 		glUniformMatrix4fv(PLocation, 1, GL_FALSE, glm::value_ptr(PROJECTION));
-		glUniformMatrix4fv(NMLocation, 1, GL_FALSE, glm::value_ptr(NM));
+		glUniformMatrix4fv(NMLocation, 1, GL_FALSE,glm::value_ptr(NM));
 		
 		// bind texture
 		glActiveTexture(GL_TEXTURE0);
@@ -159,8 +163,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUseProgram(0);
 	};
 
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
+	auto fsRender = [&](void) 
+	{
+		glUseProgram(fsProgram.mProgram);
+		glBindBuffer(GL_ARRAY_BUFFER,fullscreen.mVBO);
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
+		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
+		fullscreen.Draw(fsProgram.GetLocation(VERTEX),fsProgram.GetLocation(TEXCOORD));
+		glBindBuffer(GL_ARRAY_BUFFER,0);
+		glUseProgram(0);
+	};
+
+	/*glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);*/
 
 	while (true) 
 	{
@@ -174,15 +190,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			DispatchMessage(&msg);
 		}
 		//glBindFramebuffer(GL_FRAMEBUFFER, fbo.mFBO);
-		fbo.Bind();
-		glClearColor(1.0f, 1.0f, 1.0f,1.0f);
-		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-		//glBindFramebuffer(GL_FRAMEBUFFER,0);
-		fbo.Unbind();
+		//fbo.Bind();
+		//glClearColor(1.0f, 1.0f, 1.0f,1.0f);
+		//glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		////glBindFramebuffer(GL_FRAMEBUFFER,0);
+		//render();
+		//fbo.Unbind();
 
 		glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		render();
+		fsRender();
 		SwapBuffers(dc);
 	}
 	return  0;
