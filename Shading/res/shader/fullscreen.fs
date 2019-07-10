@@ -1,3 +1,4 @@
+#version 330
 uniform sampler2D U_MainTexture;
 varying vec2 V_Texcoord;
 

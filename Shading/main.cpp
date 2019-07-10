@@ -101,7 +101,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	fsProgram.AttachShader(GL_VERTEX_SHADER, "res/shader/fullscreen.vs");
 	fsProgram.AttachShader(GL_FRAGMENT_SHADER,"res/shader/fullscreen.fs");
 	fsProgram.LinkProgram();
-	GLuint ffffss = CreateGPUProgram("res/shader/fullscreen.vs", "res/shader/fullscreen.fs");
+	//GLuint ffffss = CreateGPUProgram("res/shader/fullscreen.vs", "res/shader/fullscreen.fs");
 
 	FullScreenQuad fullscreen;
 	fullscreen.Init(); 
@@ -166,6 +166,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	auto fsRender = [&](void) 
 	{
 		glUseProgram(fsProgram.mProgram);
+		//glUseProgram(ffffss);
 		glBindBuffer(GL_ARRAY_BUFFER,fullscreen.mVBO);
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
