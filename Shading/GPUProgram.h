@@ -17,6 +17,7 @@ class GPUProgram
 {
 private:
 	std::map<const char*, GLuint> mLocations;
+	std::map<GLenum, GLuint> mShader;
 	GLuint CompileShader(GLenum shaderType,const char*shaderFile);
 	void InitializeLocation();
 public:

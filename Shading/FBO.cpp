@@ -10,14 +10,16 @@ void FBO::AttachColorBuffer(const char* bufferName, GLenum attachment, GLenum da
 	GLuint colorBuffer;
 	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 	glGenTextures(1, &colorBuffer);
+	glBindTexture(GL_TEXTURE_2D, colorBuffer);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, dataType, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	glBindTexture(GL_TEXTURE_2D, 0);
+
 	glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, colorBuffer, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	mDrawBuffers.push(attachment);
 	mBuffer.insert(std::pair<std::string, GLuint>(bufferName,colorBuffer));
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void FBO::AttachDepthBuffer(const char* bufferName, int width, int height)
@@ -25,15 +27,17 @@ void FBO::AttachDepthBuffer(const char* bufferName, int width, int height)
 	GLuint depthMap;
 	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); 
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_COMPONENT, GL_TEXTURE_2D, depthMap, 0);
-	mBuffer.insert(std::pair<std::string,GLuint>(bufferName,depthMap));
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	mDrawBuffers.push(GL_DEPTH_ATTACHMENT);
+	mBuffer.insert(std::pair<std::string,GLuint>(bufferName,depthMap));
 }
 
 void FBO::Finish() 

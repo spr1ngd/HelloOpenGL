@@ -76,8 +76,7 @@ void GPUProgram::AttachShader(GLenum shaderType,const char*shaderFile)
 {
 	GLuint shader = this->CompileShader(shaderType, shaderFile);
 	glAttachShader(this->mProgram, shader);
-	glDetachShader(this->mProgram, shader);
-	glDeleteShader(shader);
+	this->mShader[shaderType] = shader;
 }
 
 void GPUProgram::LinkProgram() 
@@ -87,18 +86,19 @@ void GPUProgram::LinkProgram()
 	glGetProgramiv(this->mProgram, GL_LINK_STATUS, &linkResult);
 	if (linkResult == GL_FALSE)
 	{
-		char szLog[1024] = { 0 };
+		char szLog[1024]={0};
 		GLsizei logLen = 0;
 		glGetProgramInfoLog(this->mProgram, 1024, &logLen, szLog);
-		printf("[misc.cpp]: link gpu program fail. fail error : %s\n", szLog);
-
-		/*char szLog[1024]={0};
-		GLsizei logLen = 0;
-		glGetProgramInfoLog(this->mProgram, 1024, &logLen, szLog);
-		printf("LINK ERROR : %s\n", szLog);*/
-		//Debug::LogError("Link GPU Program Error");
+		printf("LINK ERROR : %s\n", szLog);
+		Debug::LogError("Link GPU Program Error");
 		glDeleteProgram(this->mProgram);
 	}
+	for (auto& v : this->mShader)
+	{
+		glDetachShader(this->mProgram, v.second);
+		glDeleteShader(v.second);
+	}
+	this->mShader.clear();
 }
 
 void GPUProgram::DetectAttribute( const char*attName ) 

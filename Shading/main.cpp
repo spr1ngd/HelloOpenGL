@@ -143,41 +143,35 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUniformMatrix4fv(VLocation, 1, GL_FALSE, glm::value_ptr(VIEW));
 		glUniformMatrix4fv(PLocation, 1, GL_FALSE, glm::value_ptr(PROJECTION));
 		glUniformMatrix4fv(NMLocation, 1, GL_FALSE,glm::value_ptr(NM));
-		
-		// bind texture
-		glActiveTexture(GL_TEXTURE0);
-		//glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
-		glBindTexture(GL_TEXTURE_2D,fbo.GetBuffer("color"));
-		glUniform1i(MainTextureLocation, 0);
-
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, secondTex->mTextureID) ;
-		//glBindTexture(GL_TEXTURE_2D,fbo.GetBuffer("color"));
-		glUniform1i(SecondTextureLocation,1);
 
 		// bind ibo
 		glBindVertexArray(vao);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ibo);
+
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
 		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
 		glBindVertexArray(0);
 		glUseProgram(0);
 	};
+ 
 
 	auto fsRender = [&](void) 
 	{
 		glUseProgram(fsProgram.mProgram);
-		//glUseProgram(ffffss);
 		glBindBuffer(GL_ARRAY_BUFFER,fullscreen.mVBO);
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
+		glEnable(GL_TEXTURE_2D); 
+		//glBindTexture(GL_TEXTURE_2D,texture->mTextureID);
+		GLuint cb = fbo.GetBuffer("color");
+		glBindTexture(GL_TEXTURE_2D,cb);
 		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
 		fullscreen.Draw(fsProgram.GetLocation(VERTEX),fsProgram.GetLocation(TEXCOORD));
 		glBindBuffer(GL_ARRAY_BUFFER,0);
 		glUseProgram(0);
 	};
 
-	/*glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);*/
+	glEnable(GL_CULL_FACE); 
+	glEnable(GL_DEPTH_TEST);
 
 	while (true) 
 	{
@@ -190,14 +184,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		//glBindFramebuffer(GL_FRAMEBUFFER, fbo.mFBO);
-		//fbo.Bind();
-		//glClearColor(1.0f, 1.0f, 1.0f,1.0f);
-		//glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-		////glBindFramebuffer(GL_FRAMEBUFFER,0);
-		//render();
-		//fbo.Unbind();
-
+		fbo.Bind();
+		glClearColor(1.0f, 1.0f, 0.7f,1.0f);
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		render();
+		fbo.Unbind();
+		
 		glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		fsRender();
