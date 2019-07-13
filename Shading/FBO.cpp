@@ -30,11 +30,10 @@ void FBO::AttachDepthBuffer(const char* bufferName, int width, int height)
 	glBindTexture(GL_TEXTURE_2D, depthMap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	mDrawBuffers.push(GL_DEPTH_ATTACHMENT);
 	mBuffer.insert(std::pair<std::string,GLuint>(bufferName,depthMap));

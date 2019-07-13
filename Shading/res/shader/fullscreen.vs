@@ -7,7 +7,7 @@ varying vec2 V_Texcoord;
 
 void main()
 {
-    vec4 position = vec4(vertex.x,vertex.y,vertex.z,1.0);
+    vec4 position = vec4(vertex.x*2,vertex.y*2,vertex.z,1.0);
     V_Texcoord = vec2(position.x + 0.5,position.y + 0.5);
     // gl_Position = vec4(vertex,1.0);
     gl_Position = position;

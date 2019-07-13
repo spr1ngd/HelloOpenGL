@@ -149,10 +149,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ibo);
 
 		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
+		//glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
+		glBindTexture(GL_TEXTURE_2D, fbo.GetBuffer("color"));
 		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
 		glBindVertexArray(0);
 		glUseProgram(0);
+		glFinish();
 	};
  
 
@@ -185,14 +187,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			DispatchMessage(&msg);
 		}
 		fbo.Bind();
-		glClearColor(1.0f, 1.0f, 0.7f,1.0f);
+		glClearColor(1.0f, 0.0f, 1.0f,1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-		render();
+		//render();
 		fbo.Unbind();
+
 		
 		glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		fsRender();
+		//fsRender();
+		render();
 		SwapBuffers(dc);
 	}
 	return  0;
