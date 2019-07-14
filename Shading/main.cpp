@@ -162,8 +162,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	{
 		glUseProgram(fsProgram.mProgram);
 		glBindBuffer(GL_ARRAY_BUFFER,fullscreen.mVBO);
-		glEnable(GL_TEXTURE_2D); 
+		//glEnable(GL_TEXTURE_2D); 
 		//glBindTexture(GL_TEXTURE_2D,texture->mTextureID);
+		glActiveTexture(GL_TEXTURE0);
 		GLuint cb = fbo.GetBuffer("color");
 		glBindTexture(GL_TEXTURE_2D,cb);
 		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
@@ -189,14 +190,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		fbo.Bind();
 		glClearColor(1.0f, 0.0f, 1.0f,1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-		//render();
+		render();
 		fbo.Unbind();
 
 		
 		glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//fsRender();
-		render();
+		fsRender();
+		//render();
 		SwapBuffers(dc);
 	}
 	return  0;
