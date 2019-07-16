@@ -90,6 +90,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	MainTextureLocation = glGetUniformLocation(program,"U_MainTexture");
 	SecondTextureLocation = glGetUniformLocation(program,"U_SecondTexture");
 
+	/*GPUProgram program;
+	program.AttachShader(GL_VERTEX_SHADER,"res/shader/diffuse.vs");
+	program.AttachShader(GL_FRAGMENT_SHADER,"res/shader/diffuse.fs");
+	program.LinkProgram();*/
+
 	// load cube model
 	unsigned int* indices = nullptr;
 	int indexCount, vertexCount;
@@ -107,8 +112,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	fullscreen.Init(); 
 
 	FBO fbo;
-	fbo.AttachColorBuffer("color", GL_COLOR_ATTACHMENT0, GL_RGBA, 256, 256);
-	fbo.AttachDepthBuffer("depth",256,256);
+	fbo.AttachColorBuffer("color", GL_COLOR_ATTACHMENT0, GL_RGBA, width, height);
+	fbo.AttachDepthBuffer("depth", width, height);
 	fbo.Finish();
 
 	GLuint vao = CreateVAO([&]()
@@ -148,22 +153,27 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glBindVertexArray(vao);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ibo);
 
-		glEnable(GL_TEXTURE_2D);
-		//glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
-		glBindTexture(GL_TEXTURE_2D, fbo.GetBuffer("color"));
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D,texture->mTextureID);
+		glUniform1i(MainTextureLocation,0);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, secondTex->mTextureID);
+		glUniform1i(SecondTextureLocation,1);
+ 
 		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
 		glBindVertexArray(0);
 		glUseProgram(0);
 		glFinish();
 	};
  
-
 	auto fsRender = [&](void) 
 	{
 		glUseProgram(fsProgram.mProgram);
 		glBindBuffer(GL_ARRAY_BUFFER,fullscreen.mVBO);
-		//glEnable(GL_TEXTURE_2D); 
-		//glBindTexture(GL_TEXTURE_2D,texture->mTextureID);
+
+		glDisable(GL_DEPTH_TEST);
+
 		glActiveTexture(GL_TEXTURE0);
 		GLuint cb = fbo.GetBuffer("color");
 		glBindTexture(GL_TEXTURE_2D,cb);
@@ -174,7 +184,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	};
 
 	glEnable(GL_CULL_FACE); 
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST); 
 
 	while (true) 
 	{
@@ -188,16 +198,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			DispatchMessage(&msg);
 		}
 		fbo.Bind();
-		glClearColor(1.0f, 0.0f, 1.0f,1.0f);
+		glClearColor(0.6f, 0.8f, 0.2f,1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
 		render();
 		fbo.Unbind();
 
-		
 		glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT);
 		fsRender();
-		//render();
+		glFinish();
 		SwapBuffers(dc);
 	}
 	return  0;
