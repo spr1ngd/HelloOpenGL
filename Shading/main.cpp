@@ -135,7 +135,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	ShowWindow(hwnd, SW_SHOW);
 	UpdateWindow(hwnd); 
 
-	glm::mat4 MODEL = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -4.0f)) * glm::rotate(glm::mat4(1.0f),60.0f,glm::vec3(0.0f,1.0f,0.0f));
+	glm::mat4 MODEL = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.0f)) * glm::rotate(glm::mat4(1.0f),60.0f,glm::vec3(0.0f,1.0f,0.0f));
 	glm::mat4 PROJECTION = glm::perspective(45.0f, float(width) / (float)height, 0.1f, 200.0f);
 	glm::mat4 ORTHO = glm::ortho(-400.0f, 400.0f, -300.0f, 300.0f);
 	glm::mat4 VIEW = glm::mat4(1.0f);
