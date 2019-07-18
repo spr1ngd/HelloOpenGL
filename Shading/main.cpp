@@ -78,7 +78,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	height = rect.bottom - rect.top;
 
 	// create GPU program
-	GLuint program = CreateGPUProgram("res/shader/diffuse.vs", "res/shader/diffuse.fs");
+	GLuint program = CreateGPUProgram("res/shader/ambient.vs", "res/shader/ambient.fs");
 	GLuint MLocation, VLocation, PLocation,NMLocation, vertexLocation, normalLocation, texcoordLocation,MainTextureLocation,SecondTextureLocation;
 	vertexLocation = glGetAttribLocation(program, "vertex");
 	normalLocation = glGetAttribLocation(program, "normal");
@@ -90,15 +90,30 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	MainTextureLocation = glGetUniformLocation(program,"U_MainTexture");
 	SecondTextureLocation = glGetUniformLocation(program,"U_SecondTexture");
 
+	GLuint lightColorLocation = glGetUniformLocation(program, "U_LightColor");
+	GLuint materialColorLocation = glGetUniformLocation(program,"U_MaterialColor");
+
 	/*GPUProgram program;
 	program.AttachShader(GL_VERTEX_SHADER,"res/shader/diffuse.vs");
 	program.AttachShader(GL_FRAGMENT_SHADER,"res/shader/diffuse.fs");
-	program.LinkProgram();*/
+	program.LinkProgram();
+	program.DetectUniform("U_LightColor");	GLuint program = CreateGPUProgram("res/shader/diffuse.vs", "res/shader/diffuse.fs");
+	GLuint MLocation, VLocation, PLocation,NMLocation, vertexLocation, normalLocation, texcoordLocation,MainTextureLocation,SecondTextureLocation;
+	vertexLocation = glGetAttribLocation(program, "vertex");
+	normalLocation = glGetAttribLocation(program, "normal");
+	texcoordLocation = glGetAttribLocation(program,"texcoord");
+	MLocation = glGetUniformLocation(program, "M");
+	VLocation = glGetUniformLocation(program, "V");
+	PLocation = glGetUniformLocation(program,"P");
+	NMLocation = glGetUniformLocation(program, "NM");
+	MainTextureLocation = glGetUniformLocation(program,"U_MainTexture");
+	SecondTextureLocation = glGetUniformLocation(program,"U_SecondTexture");
+	program.DetectUniform("U_MaterialColor");*/
 
 	// load cube model
 	unsigned int* indices = nullptr;
 	int indexCount, vertexCount;
-	VertexData* vertices = LoadObjModel("res/model/cube.obj", &indices, indexCount, vertexCount);
+	VertexData* vertices = LoadObjModel("res/model/sphere.obj", &indices, indexCount, vertexCount);
 	Texture* texture = Texture::LoadTexture("res/texture/fur.jpg");
 	Texture* secondTex = Texture::LoadTexture("res/texture/carbon_fiber.jpg");
 
@@ -126,6 +141,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 3));
 		glEnableVertexAttribArray(texcoordLocation);
 		glVertexAttribPointer(texcoordLocation,2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 6));
+	/*	program.EnableVertexAttrib(VERTEX, 3, sizeof(VertexData), (void*)0);
+		program.EnableVertexAttrib(NORMAL,3,sizeof(VertexData),(void*)(sizeof(float) *3));
+		program.EnableVertexAttrib(TEXCOORD,2,sizeof(VertexData),(void*)(sizeof(float) * 6));*/
 		glBindBuffer(GL_ARRAY_BUFFER,0);
 	});
 	GLuint ibo = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER,sizeof(unsigned int)*indexCount,GL_STATIC_DRAW,indices);
@@ -135,34 +153,48 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	ShowWindow(hwnd, SW_SHOW);
 	UpdateWindow(hwnd); 
 
-	glm::mat4 MODEL = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.0f)) * glm::rotate(glm::mat4(1.0f),60.0f,glm::vec3(0.0f,1.0f,0.0f));
+	glm::mat4 MODEL = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f)) * glm::rotate(glm::mat4(1.0f),60.0f,glm::vec3(0.0f,1.0f,0.0f));
 	glm::mat4 PROJECTION = glm::perspective(45.0f, float(width) / (float)height, 0.1f, 200.0f);
 	glm::mat4 ORTHO = glm::ortho(-400.0f, 400.0f, -300.0f, 300.0f);
 	glm::mat4 VIEW = glm::mat4(1.0f);
 	glm::mat4 NM = glm::inverseTranspose(MODEL);
 
+	float lightColor[] = {0.4f,0.4f,0.4f,1.0f};
+	float materialColor[] = {0.4f,0.4f,0.4f,1.0f};
+
 	auto render = [&](void)
 	{
+		//glUseProgram(program.mProgram);
 		glUseProgram(program);
 		glUniformMatrix4fv(MLocation, 1, GL_FALSE, glm::value_ptr(MODEL));
 		glUniformMatrix4fv(VLocation, 1, GL_FALSE, glm::value_ptr(VIEW));
 		glUniformMatrix4fv(PLocation, 1, GL_FALSE, glm::value_ptr(PROJECTION));
 		glUniformMatrix4fv(NMLocation, 1, GL_FALSE,glm::value_ptr(NM));
+		/*program.EnableUniform(M_MATRIX,glm::value_ptr(MODEL));
+		program.EnableUniform(V_MATRIX,glm::value_ptr(VIEW));
+		program.EnableUniform(P_MATRIX, glm::value_ptr(PROJECTION));
+		program.EnableUniform(NM_MATRIX,glm::value_ptr(NM));
+		program.EnableUniform("U_LightColor",lightColor);
+		program.EnableUniform("U_MaterialColor",materialColor);*/
+
+	/*	glUniform4fv(lightColorLocation, 1, lightColor);
+		glUniform4fv(materialColorLocation,1,materialColor);*/
 
 		// bind ibo
 		glBindVertexArray(vao);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ibo);
 
-		glActiveTexture(GL_TEXTURE0);
+		/*glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D,texture->mTextureID);
 		glUniform1i(MainTextureLocation,0);
 
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, secondTex->mTextureID);
-		glUniform1i(SecondTextureLocation,1);
+		glUniform1i(SecondTextureLocation,1);*/
  
 		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
 		glBindVertexArray(0);
+
 		glUseProgram(0);
 		glFinish();
 	};
@@ -171,7 +203,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	{
 		glUseProgram(fsProgram.mProgram);
 		glBindBuffer(GL_ARRAY_BUFFER,fullscreen.mVBO);
-
 		glDisable(GL_DEPTH_TEST);
 
 		glActiveTexture(GL_TEXTURE0);
@@ -197,16 +228,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		fbo.Bind();
-		glClearColor(0.6f, 0.8f, 0.2f,1.0f);
+		//fbo.Bind();
+		glClearColor(0.3f, 0.3f, 0.3f,1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 		render();
-		fbo.Unbind();
+		//fbo.Unbind();
 
-		glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
+		/*glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		fsRender();
+		fsRender();*/
 		glFinish();
 		SwapBuffers(dc);
 	}

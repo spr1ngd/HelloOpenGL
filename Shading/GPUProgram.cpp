@@ -5,6 +5,7 @@
 GPUProgram::GPUProgram() 
 {
 	mProgram = glCreateProgram();
+	this->InitializeLocation();
 }
 
 void GPUProgram::InitializeLocation() 
