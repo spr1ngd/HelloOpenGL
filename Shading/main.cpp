@@ -78,7 +78,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	height = rect.bottom - rect.top;
 
 	// create GPU program
-	GLuint program = CreateGPUProgram("res/shader/ambient.vs", "res/shader/ambient.fs");
+	GLuint program = CreateGPUProgram("res/shader/specular_fs.vs", "res/shader/specular_fs.fs");
 	GLuint MLocation, VLocation, PLocation,NMLocation, vertexLocation, normalLocation, texcoordLocation,MainTextureLocation,SecondTextureLocation;
 	vertexLocation = glGetAttribLocation(program, "vertex");
 	normalLocation = glGetAttribLocation(program, "normal");
@@ -90,25 +90,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	MainTextureLocation = glGetUniformLocation(program,"U_MainTexture");
 	SecondTextureLocation = glGetUniformLocation(program,"U_SecondTexture");
 
-	GLuint lightColorLocation = glGetUniformLocation(program, "U_LightColor");
-	GLuint materialColorLocation = glGetUniformLocation(program,"U_MaterialColor");
-
-	/*GPUProgram program;
-	program.AttachShader(GL_VERTEX_SHADER,"res/shader/diffuse.vs");
-	program.AttachShader(GL_FRAGMENT_SHADER,"res/shader/diffuse.fs");
-	program.LinkProgram();
-	program.DetectUniform("U_LightColor");	GLuint program = CreateGPUProgram("res/shader/diffuse.vs", "res/shader/diffuse.fs");
-	GLuint MLocation, VLocation, PLocation,NMLocation, vertexLocation, normalLocation, texcoordLocation,MainTextureLocation,SecondTextureLocation;
-	vertexLocation = glGetAttribLocation(program, "vertex");
-	normalLocation = glGetAttribLocation(program, "normal");
-	texcoordLocation = glGetAttribLocation(program,"texcoord");
-	MLocation = glGetUniformLocation(program, "M");
-	VLocation = glGetUniformLocation(program, "V");
-	PLocation = glGetUniformLocation(program,"P");
-	NMLocation = glGetUniformLocation(program, "NM");
-	MainTextureLocation = glGetUniformLocation(program,"U_MainTexture");
-	SecondTextureLocation = glGetUniformLocation(program,"U_SecondTexture");
-	program.DetectUniform("U_MaterialColor");*/
+	GLuint viewPosLocation = glGetUniformLocation(program,"U_ViewPos");
+	GLuint lightPosLocation = glGetUniformLocation(program, "U_LightPos");
+	GLuint lightColorLocation = glGetUniformLocation(program,"U_LightColor");
+	GLuint diffuseColorLocation = glGetUniformLocation(program,"U_DiffuseColor");
+	GLuint diffuseMaterialLocation = glGetUniformLocation(program,"U_DiffuseMaterial");
+	GLuint specularColorLocation = glGetUniformLocation(program,"U_SpecularColor");
+	GLuint specularMaterialLocation = glGetUniformLocation(program,"U_SpecularMaterial");
+	GLuint ambientColorLocation = glGetUniformLocation(program,"U_AmbientColor");
 
 	// load cube model
 	unsigned int* indices = nullptr;
@@ -159,26 +148,42 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	glm::mat4 VIEW = glm::mat4(1.0f);
 	glm::mat4 NM = glm::inverseTranspose(MODEL);
 
-	float lightColor[] = {0.4f,0.4f,0.4f,1.0f};
+	float viewPos[] = {0.0f,0.0f,0.0f};
+
+	// LIGHT SETTING
+	float lightPos[] = {1.0f,1.0f,0.0f};
+	float lightColor[] = {1.0f,1.0f,1.0f,1.0f};
+
+	// AMBIENT SETTING
+	float ambientColor[] = { 0.12f,0.12f,0.12f,1.0f };
+
+	// DIFFUSE SETTING
 	float materialColor[] = {0.4f,0.4f,0.4f,1.0f};
+	float diffuseColor[] = {0.5f,0.5f,0.5f,1.0f};
+
+	// SPECULAR SETTING
+	float specularColor[] = { 1.0f,0.6f,0.3f,1.0f };
+	float specularMaterialColor[] = {1.0f,1.0f,1.0f,1.0f};
 
 	auto render = [&](void)
-	{
-		//glUseProgram(program.mProgram);
+	{ 
 		glUseProgram(program);
 		glUniformMatrix4fv(MLocation, 1, GL_FALSE, glm::value_ptr(MODEL));
 		glUniformMatrix4fv(VLocation, 1, GL_FALSE, glm::value_ptr(VIEW));
 		glUniformMatrix4fv(PLocation, 1, GL_FALSE, glm::value_ptr(PROJECTION));
 		glUniformMatrix4fv(NMLocation, 1, GL_FALSE,glm::value_ptr(NM));
-		/*program.EnableUniform(M_MATRIX,glm::value_ptr(MODEL));
-		program.EnableUniform(V_MATRIX,glm::value_ptr(VIEW));
-		program.EnableUniform(P_MATRIX, glm::value_ptr(PROJECTION));
-		program.EnableUniform(NM_MATRIX,glm::value_ptr(NM));
-		program.EnableUniform("U_LightColor",lightColor);
-		program.EnableUniform("U_MaterialColor",materialColor);*/
 
-	/*	glUniform4fv(lightColorLocation, 1, lightColor);
-		glUniform4fv(materialColorLocation,1,materialColor);*/
+		glUniform4fv(ambientColorLocation,1,ambientColor);
+
+		glUniform3fv(viewPosLocation,1,viewPos);
+		glUniform3fv(lightPosLocation,1,lightPos);
+		glUniform4fv(lightColorLocation,1,lightColor);
+
+		glUniform4fv(diffuseColorLocation,1,diffuseColor);
+		glUniform4fv(diffuseMaterialLocation,1,materialColor);
+
+		glUniform4fv(specularColorLocation,1,specularColor);
+		glUniform4fv(specularMaterialLocation,1,specularMaterialColor);
 
 		// bind ibo
 		glBindVertexArray(vao);
@@ -229,7 +234,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			DispatchMessage(&msg);
 		}
 		//fbo.Bind();
-		glClearColor(0.3f, 0.3f, 0.3f,1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f,1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 		render();
