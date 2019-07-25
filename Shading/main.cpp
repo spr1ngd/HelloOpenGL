@@ -78,7 +78,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	height = rect.bottom - rect.top;
 
 	// create GPU program
-	GLuint program = CreateGPUProgram("res/shader/specular_fs.vs", "res/shader/specular_fs.fs");
+	GLuint program = CreateGPUProgram("res/shader/cartoon_fs.vs", "res/shader/cartoon_fs.fs");
 	GLuint MLocation, VLocation, PLocation,NMLocation, vertexLocation, normalLocation, texcoordLocation,MainTextureLocation,SecondTextureLocation;
 	vertexLocation = glGetAttribLocation(program, "vertex");
 	normalLocation = glGetAttribLocation(program, "normal");

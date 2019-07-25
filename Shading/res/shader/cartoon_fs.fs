@@ -36,9 +36,9 @@ void main()
     vec3 viewDir = normalize(U_LightPos-V_WorldPos.xyz);
     float specular = pow(max(0.0,dot(reflectDir,viewDir)),32);
     vec4 specularColor;
-    if( specular < 0.5 )
+    if( specular < 0.3 )
     {
-        specularColor = vec4(0.0,0.0,0.0,1.0)
+        specularColor = vec4(0.0,0.0,0.0,1.0);
     }
     else
     {
