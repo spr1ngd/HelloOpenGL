@@ -78,7 +78,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	height = rect.bottom - rect.top;
 
 	// create GPU program
-	GLuint program = CreateGPUProgram("res/shader/cartoon_fs.vs", "res/shader/cartoon_fs.fs");
+	GLuint program = CreateGPUProgram("res/shader/direction_light.vs", 
+									  "res/shader/direction_light.fs");
 	GLuint MLocation, VLocation, PLocation,NMLocation, vertexLocation, normalLocation, texcoordLocation,MainTextureLocation,SecondTextureLocation;
 	vertexLocation = glGetAttribLocation(program, "vertex");
 	normalLocation = glGetAttribLocation(program, "normal");
@@ -151,7 +152,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	float viewPos[] = {0.0f,0.0f,0.0f};
 
 	// LIGHT SETTING
-	float lightPos[] = {1.0f,1.0f,0.0f};
+	float lightPos[] = {1.0f,1.0f,0.0f,0.0f};
 	float lightColor[] = {1.0f,1.0f,1.0f,1.0f};
 
 	// AMBIENT SETTING
@@ -176,7 +177,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUniform4fv(ambientColorLocation,1,ambientColor);
 
 		glUniform3fv(viewPosLocation,1,viewPos);
-		glUniform3fv(lightPosLocation,1,lightPos);
+		glUniform4fv(lightPosLocation,1,lightPos);
 		glUniform4fv(lightColorLocation,1,lightColor);
 
 		glUniform4fv(diffuseColorLocation,1,diffuseColor);
