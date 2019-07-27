@@ -149,15 +149,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	glm::mat4 MODEL = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));// *glm::rotate(glm::mat4(1.0f), 30.0f, glm::vec3(1.0f, 0.0f, 0.0f))
 		//;// *glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f));
 	glm::mat4 PROJECTION = glm::perspective(45.0f, float(width) / (float)height, 0.1f, 200.0f);
-	glm::mat4 ORTHO = glm::ortho(-400.0f, 400.0f, -300.0f, 300.0f);
+	glm::mat4 ORTHO = glm::ortho(-width/2.0f, width/2.0f, -height/2.0f, height/2.0f);
 	glm::mat4 VIEW = glm::mat4(1.0f);
 	glm::mat4 NM = glm::inverseTranspose(MODEL);
 
 	float viewPos[] = {0.0f,0.0f,0.0f};
 
 	// LIGHT SETTING
-	//float lightPos[] = {2.0f,2.0f,2.0f,1.0};
-	float lightPos[] = {0.0f,5.0f,-2.0f,1.0f};
+	float lightPos[] = {2.0f,2.0f,2.0f,.0};
+	// float lightPos[] = {0.0f,5.0f,-2.0f,1.0f};
 	float lightColor[] = {1.0f,1.0f ,1.0f,1.0f};
 	float lightDirection[] = {0.0f,-1.0f,0.0f,128.0f};
 	float lightIntensity = 3.0f;
@@ -221,16 +221,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	auto fsRender = [&](void) 
 	{
 		glUseProgram(fsProgram.mProgram);
-		glBindBuffer(GL_ARRAY_BUFFER,fullscreen.mVBO);
 		glDisable(GL_DEPTH_TEST);
 
-		glActiveTexture(GL_TEXTURE0);
-		GLuint cb = fbo.GetBuffer("color");
-		glBindTexture(GL_TEXTURE_2D,cb);
+		glBindBuffer(GL_ARRAY_BUFFER,fullscreen.mVBO);
+		//glActiveTexture(GL_TEXTURE0);
+		//GLuint cb = fbo.GetBuffer("color");
+		glBindTexture(GL_TEXTURE_2D, secondTex->mTextureID);
 		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
-		fullscreen.Draw(fsProgram.GetLocation(VERTEX),fsProgram.GetLocation(TEXCOORD));
+		fullscreen.Draw(fsProgram.GetLocation(VERTEX)); //,fsProgram.GetLocation(TEXCOORD) 
+
 		glBindBuffer(GL_ARRAY_BUFFER,0);
 		glUseProgram(0);
+		glFinish();
 	};
 
 	glEnable(GL_CULL_FACE); 
@@ -247,16 +249,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+
 		//fbo.Bind();
-		glClearColor(0.0f, 0.0f, 0.0f,1.0f);
+	/*	glClearColor(0.0f, 0.0f, 0.0f,1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
-		render();
+		render();*/
 		//fbo.Unbind();
 
-		/*glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-		fsRender();*/
+		//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		fsRender();
 		glFinish();
 		SwapBuffers(dc);
 	}
