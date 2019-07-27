@@ -78,8 +78,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	height = rect.bottom - rect.top;
 
 	// create GPU program
-	GLuint program = CreateGPUProgram("res/shader/direction_light.vs", 
-									  "res/shader/direction_light.fs");
+	GLuint program = CreateGPUProgram("res/shader/light.vs", 
+									  "res/shader/light.fs");
 	GLuint MLocation, VLocation, PLocation,NMLocation, vertexLocation, normalLocation, texcoordLocation,MainTextureLocation,SecondTextureLocation;
 	vertexLocation = glGetAttribLocation(program, "vertex");
 	normalLocation = glGetAttribLocation(program, "normal");
@@ -94,6 +94,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	GLuint viewPosLocation = glGetUniformLocation(program,"U_ViewPos");
 	GLuint lightPosLocation = glGetUniformLocation(program, "U_LightPos");
 	GLuint lightColorLocation = glGetUniformLocation(program,"U_LightColor");
+	GLuint lightDirectionLocation = glGetUniformLocation(program,"U_LightDirection");
+	GLuint spotLightCutoffLocation = glGetUniformLocation(program,"U_SpotLightCutoff");
+	GLuint lightIntensityLocation = glGetUniformLocation(program,"U_LightIntensity");
 	GLuint diffuseColorLocation = glGetUniformLocation(program,"U_DiffuseColor");
 	GLuint diffuseMaterialLocation = glGetUniformLocation(program,"U_DiffuseMaterial");
 	GLuint specularColorLocation = glGetUniformLocation(program,"U_SpecularColor");
@@ -103,7 +106,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	// load cube model
 	unsigned int* indices = nullptr;
 	int indexCount, vertexCount;
-	VertexData* vertices = LoadObjModel("res/model/sphere.obj", &indices, indexCount, vertexCount);
+	VertexData* vertices = LoadObjModel("res/model/Sphere.obj", &indices, indexCount, vertexCount);
 	Texture* texture = Texture::LoadTexture("res/texture/fur.jpg");
 	Texture* secondTex = Texture::LoadTexture("res/texture/carbon_fiber.jpg");
 
@@ -143,7 +146,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	ShowWindow(hwnd, SW_SHOW);
 	UpdateWindow(hwnd); 
 
-	glm::mat4 MODEL = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f)) * glm::rotate(glm::mat4(1.0f),60.0f,glm::vec3(0.0f,1.0f,0.0f));
+	glm::mat4 MODEL = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));// *glm::rotate(glm::mat4(1.0f), 30.0f, glm::vec3(1.0f, 0.0f, 0.0f))
+		//;// *glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f));
 	glm::mat4 PROJECTION = glm::perspective(45.0f, float(width) / (float)height, 0.1f, 200.0f);
 	glm::mat4 ORTHO = glm::ortho(-400.0f, 400.0f, -300.0f, 300.0f);
 	glm::mat4 VIEW = glm::mat4(1.0f);
@@ -152,8 +156,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	float viewPos[] = {0.0f,0.0f,0.0f};
 
 	// LIGHT SETTING
-	float lightPos[] = {1.0f,1.0f,0.0f,0.0f};
-	float lightColor[] = {1.0f,1.0f,1.0f,1.0f};
+	//float lightPos[] = {2.0f,2.0f,2.0f,1.0};
+	float lightPos[] = {0.0f,5.0f,-2.0f,1.0f};
+	float lightColor[] = {1.0f,1.0f ,1.0f,1.0f};
+	float lightDirection[] = {0.0f,-1.0f,0.0f,128.0f};
+	float lightIntensity = 3.0f;
+
+	// SPOT LIGTH SETTING	
+	float spotLightCutoff = 15.0f;
 
 	// AMBIENT SETTING
 	float ambientColor[] = { 0.12f,0.12f,0.12f,1.0f };
@@ -163,7 +173,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	float diffuseColor[] = {0.5f,0.5f,0.5f,1.0f};
 
 	// SPECULAR SETTING
-	float specularColor[] = { 1.0f,0.6f,0.3f,1.0f };
+	float specularColor[] = { 0.75f,0.75f,0.75f,1.0f };
 	float specularMaterialColor[] = {1.0f,1.0f,1.0f,1.0f};
 
 	auto render = [&](void)
@@ -179,6 +189,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUniform3fv(viewPosLocation,1,viewPos);
 		glUniform4fv(lightPosLocation,1,lightPos);
 		glUniform4fv(lightColorLocation,1,lightColor);
+		glUniform4fv(lightDirectionLocation,1,lightDirection);
+		glUniform1f(spotLightCutoffLocation, spotLightCutoff);
+		glUniform1f(lightIntensityLocation, lightIntensity);
 
 		glUniform4fv(diffuseColorLocation,1,diffuseColor);
 		glUniform4fv(diffuseMaterialLocation,1,materialColor);
