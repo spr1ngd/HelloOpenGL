@@ -114,7 +114,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	fsProgram.AttachShader(GL_VERTEX_SHADER, "res/shader/fullscreen.vs");
 	fsProgram.AttachShader(GL_FRAGMENT_SHADER,"res/shader/fullscreen.fs");
 	fsProgram.LinkProgram();
-	//GLuint ffffss = CreateGPUProgram("res/shader/fullscreen.vs", "res/shader/fullscreen.fs");
+	fsProgram.InitializeLocation();
 
 	FullScreenQuad fullscreen;
 	fullscreen.Init(); 
@@ -221,22 +221,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	auto fsRender = [&](void) 
 	{
 		glUseProgram(fsProgram.mProgram);
-		glDisable(GL_DEPTH_TEST);
-
 		glBindBuffer(GL_ARRAY_BUFFER,fullscreen.mVBO);
-		//glActiveTexture(GL_TEXTURE0);
-		//GLuint cb = fbo.GetBuffer("color");
-		glBindTexture(GL_TEXTURE_2D, secondTex->mTextureID);
+		glDisable(GL_DEPTH_TEST);
+		glActiveTexture(GL_TEXTURE0);
+		GLuint cb = fbo.GetBuffer("color");
+		glBindTexture(GL_TEXTURE_2D, cb);
 		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
-		fullscreen.Draw(fsProgram.GetLocation(VERTEX)); //,fsProgram.GetLocation(TEXCOORD) 
-
+		GLuint posLocation = fsProgram.GetLocation(VERTEX);
+		GLuint texcoordLocation = fsProgram.GetLocation(TEXCOORD);
+		fullscreen.Draw(posLocation, texcoordLocation);
 		glBindBuffer(GL_ARRAY_BUFFER,0);
 		glUseProgram(0);
-		glFinish();
+		//glFinish();
 	};
 
 	glEnable(GL_CULL_FACE); 
-	//glEnable(GL_DEPTH_TEST); 
+	glEnable(GL_DEPTH_TEST); 
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	while (true) 
 	{
@@ -250,12 +251,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			DispatchMessage(&msg);
 		}
 
-		//fbo.Bind();
-	/*	glClearColor(0.0f, 0.0f, 0.0f,1.0f);
+		fbo.Bind();
+		glClearColor(0.0f, 0.0f, 0.0f,1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
-		render();*/
-		//fbo.Unbind();
+		render();
+		fbo.Unbind();
 
 		//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);

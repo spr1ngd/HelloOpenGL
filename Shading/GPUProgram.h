@@ -19,11 +19,12 @@ private:
 	std::map<const char*, GLuint> mLocations;
 	std::map<GLenum, GLuint> mShader;
 	GLuint CompileShader(GLenum shaderType,const char*shaderFile);
-	void InitializeLocation();
+	
 public:
 	GPUProgram();
 	GLuint mProgram;
 public:
+	void InitializeLocation();
 	void AttachShader(GLenum shaderType,const char*shaderFile);
 	void LinkProgram();
 	void DetectAttribute(const char*attName);

@@ -5,7 +5,6 @@
 GPUProgram::GPUProgram() 
 {
 	mProgram = glCreateProgram();
-	this->InitializeLocation();
 }
 
 void GPUProgram::InitializeLocation() 
@@ -129,5 +128,6 @@ void GPUProgram::EnableUniform(const char* uniformName, const GLfloat*value)
 
 GLuint GPUProgram::GetLocation( const char*name )   
 {
-	return this->mLocations[name];
+	GLuint location = this->mLocations[name];
+	return location;
 }
