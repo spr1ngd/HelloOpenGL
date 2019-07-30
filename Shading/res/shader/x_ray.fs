@@ -11,10 +11,12 @@ void main()
     vec3 N = normalize(V_Normal);
     float cosThta = dot(L,N);
     float alpha = 1.0;
+    //gl_FragColor = vec4(cosThta,cosThta,cosThta,alpha);
+
     if( cosThta > 0.0 )
     {
         // alpha = 1.0 - cosThta;
-        alpha = 1.0 - pow(cosThta,32);
+        alpha = 1.0 - pow(cosThta,2);
     }
-    gl_FragColor = vec4(0.1,0.4,0.7,alpha);
+    gl_FragColor = vec4(1.0,1.0,1.0,alpha);
 }

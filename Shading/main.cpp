@@ -78,8 +78,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	height = rect.bottom - rect.top;
 
 	// create GPU program
-	GLuint program = CreateGPUProgram("res/shader/light.vs", 
-									  "res/shader/light.fs");
+	GLuint program = CreateGPUProgram("res/shader/x_ray.vs", 
+									  "res/shader/x_ray.fs");
 	GLuint MLocation, VLocation, PLocation,NMLocation, vertexLocation, normalLocation, texcoordLocation,MainTextureLocation,SecondTextureLocation;
 	vertexLocation = glGetAttribLocation(program, "vertex");
 	normalLocation = glGetAttribLocation(program, "normal");
@@ -252,17 +252,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			DispatchMessage(&msg);
 		}
 
-		fbo.Bind();
-		glClearColor(0.0f, 0.0f, 0.0f,1.0f);
+		//fbo.Bind();
+		glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
+		//glClearColor(0.0f, 0.0f, 0.0f,1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_DEPTH_TEST);
 		render();
-		fbo.Unbind();
+		//fbo.Unbind();
 
 		//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		/*glDisable(GL_BLEND);
 		glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-		fsRender();
+		fsRender();*/
 		glFinish();
 		SwapBuffers(dc);
 	}
