@@ -221,16 +221,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	auto fsRender = [&](void) 
 	{
 		glUseProgram(fsProgram.mProgram);
-		glBindBuffer(GL_ARRAY_BUFFER,fullscreen.mVBO);
+		//glBindBuffer(GL_ARRAY_BUFFER,fullscreen.mVBO);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glDisable(GL_DEPTH_TEST);
 		glActiveTexture(GL_TEXTURE0);
 		GLuint cb = fbo.GetBuffer("color");
 		glBindTexture(GL_TEXTURE_2D, cb);
 		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
 		GLuint posLocation = fsProgram.GetLocation(VERTEX);
-		GLuint texcoordLocation = fsProgram.GetLocation(TEXCOORD);
-		fullscreen.Draw(posLocation, texcoordLocation);
-		glBindBuffer(GL_ARRAY_BUFFER,0);
+		GLuint texcoordLocation = fsProgram.GetLocation(TEXCOORD); // ISSUE: GET TEXCOORD LOCATION ERROR.
+		fullscreen.Draw(posLocation, texcoordLocation/*,new Rect(-1.0f,0.0f,1.0f,0.0f)*/);
+		//glBindBuffer(GL_ARRAY_BUFFER,0);
 		glUseProgram(0);
 		//glFinish();
 	};

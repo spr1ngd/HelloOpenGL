@@ -10,7 +10,7 @@ GPUProgram::GPUProgram()
 void GPUProgram::InitializeLocation() 
 {
 	// vertex
-	GLuint vertexLocation = glGetAttribLocation(this->mProgram, VERTEX);
+	GLuint vertexLocation = glGetAttribLocation(mProgram, VERTEX);
 	this->mLocations.insert(std::pair<const char*,GLuint>(VERTEX, vertexLocation));
 
 	// normal
@@ -18,7 +18,7 @@ void GPUProgram::InitializeLocation()
 	this->mLocations.insert(std::pair<const char*,GLuint>(NORMAL,normalLocation));
 
 	// texcoord
-	GLuint texcoordLocation = glGetAttribLocation(this->mProgram,TEXCOORD);
+	GLuint texcoordLocation = glGetAttribLocation(mProgram,TEXCOORD);
 	this->mLocations.insert(std::pair<const char*,GLuint>(TEXCOORD,texcoordLocation));
 
 	// M
