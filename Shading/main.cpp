@@ -79,7 +79,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	// create GPU program
 	GLuint program = CreateGPUProgram("res/shader/light.vs", 
-									  "res/shader/light.fs");
+									  "res/shader/light/hdr_light.fs");
 	GLuint MLocation, VLocation, PLocation,NMLocation, vertexLocation, normalLocation, texcoordLocation,MainTextureLocation,SecondTextureLocation;
 	vertexLocation = glGetAttribLocation(program, "vertex");
 	normalLocation = glGetAttribLocation(program, "normal");
@@ -140,6 +140,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	easyGaussianProgram.LinkProgram();
 	easyGaussianProgram.InitializeLocation();
 
+	GPUProgram hdrProgram;
+	hdrProgram.AttachShader(GL_VERTEX_SHADER,"res/shader/fullscreen.vs");
+	hdrProgram.AttachShader(GL_FRAGMENT_SHADER,"res/shader/hdr/hdr_composite.fs");
+	hdrProgram.LinkProgram();
+	hdrProgram.InitializeLocation();
+	hdrProgram.DetectUniform("U_HDRTetxure");
+
 	FullScreenQuad fullscreen;
 	fullscreen.Init(); 
 
@@ -162,6 +169,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	fbo3.AttachColorBuffer("color", GL_COLOR_ATTACHMENT0, GL_RGBA, width, height);
 	fbo3.AttachDepthBuffer("depth", width, height);
 	fbo3.Finish();
+
+	FBO hdrFBO;
+	hdrFBO.AttachColorBuffer("color",GL_COLOR_ATTACHMENT0,GL_RGBA,width,height);
+	hdrFBO.AttachColorBuffer("hdrColor",GL_COLOR_ATTACHMENT1,GL_RGBA16F,width,height);
+	hdrFBO.AttachDepthBuffer("depth",width,height);
+	hdrFBO.Finish();
 
 	GLuint vao = CreateVAO([&]()
 	{
@@ -264,7 +277,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glDisable(GL_DEPTH_TEST);
 		glActiveTexture(GL_TEXTURE0);
-		GLuint cb = fbo.GetBuffer("color");
+		GLuint cb = hdrFBO.GetBuffer("color");
 		glBindTexture(GL_TEXTURE_2D, cb);
 		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
 		GLuint posLocation = fsProgram.GetLocation(VERTEX);
@@ -276,23 +289,31 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	auto renderTopRight = [&](void) 
 	{
-		glUseProgram(gaussianProgram.mProgram);
+		glUseProgram(fsProgram.mProgram);
 		glActiveTexture(GL_TEXTURE0);
-		GLuint cb = fbo1.GetBuffer("color");
+		GLuint cb = hdrFBO.GetBuffer("hdrColor");
 		glBindTexture(GL_TEXTURE_2D, cb);
 		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
-		fullscreen.Draw(gaussianProgram.GetLocation(VERTEX), gaussianProgram.GetLocation(TEXCOORD),new Rect(0.0f,1.0f,1.0f,0.0f));
+		fullscreen.Draw(fsProgram.GetLocation(VERTEX), fsProgram.GetLocation(TEXCOORD),new Rect(0.0f,1.0f,1.0f,0.0f));
 		glUseProgram(0);
 	};
 
 	auto renderBottomLeft = [&](void) 
 	{
-		glUseProgram(gaussianProgram.mProgram);
+		glUseProgram(hdrProgram.mProgram);
+
 		glActiveTexture(GL_TEXTURE0);
-		GLuint cb = fbo1.GetBuffer("color");
+		GLuint cb = hdrFBO.GetBuffer("color");
 		glBindTexture(GL_TEXTURE_2D, cb);
-		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
-		fullscreen.Draw(gaussianProgram.GetLocation(VERTEX), gaussianProgram.GetLocation(TEXCOORD), new Rect(-1.0f,0.0f,0.0f,-1.0f));
+		glUniform1i(hdrProgram.GetLocation(MAIN_TEXTURE), 0);
+
+		glActiveTexture(GL_TEXTURE1); 
+		GLuint hdrbuffer = hdrFBO.GetBuffer("hdrColor");
+		glBindTexture(GL_TEXTURE_2D,hdrbuffer);
+		GLuint hdrTextureLocation = hdrProgram.GetLocation("U_HDRTexture");
+		glUniform1i(hdrTextureLocation, 1);
+
+		fullscreen.Draw(hdrProgram.GetLocation(VERTEX), hdrProgram.GetLocation(TEXCOORD), new Rect(-1.0f,0.0f,0.0f,-1.0f));
 		glUseProgram(0);
 	};
 
@@ -323,17 +344,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			DispatchMessage(&msg);
 		}
 
-		fbo.Bind();
-		//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
+		//fbo.Bind();
+		hdrFBO.Bind();
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		//glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 		/*glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_DEPTH_TEST);*/
 		render();
-		fbo.Unbind();
+		hdrFBO.Unbind();
+		//fbo.Unbind();
 
-		fbo1.Bind();
+	/*	fbo1.Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(gaussianProgram.mProgram);
 		glBindTexture(GL_TEXTURE_2D, fbo.GetBuffer("color"));
@@ -358,22 +381,24 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
 		fullscreen.Draw(gaussianProgram.GetLocation(VERTEX), gaussianProgram.GetLocation(TEXCOORD));
 		glUseProgram(0);
-		fbo3.Unbind();
+		fbo3.Unbind();*/
 
 		glDisable(GL_BLEND);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		//glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		// top left
 		fsRender();
 
-		// blur x1
+		// top right
 		renderTopRight();
 
-		// blur x2
+		// bottom left
 		renderBottomLeft();
 
-		// blur x3
-		renderBottomRight();
+		// bottom right
+		//renderBottomRight();
+
 		glFinish();
 		SwapBuffers(dc);
 	}

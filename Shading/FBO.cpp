@@ -15,11 +15,18 @@ void FBO::AttachColorBuffer(const char* bufferName, GLenum attachment, GLenum da
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, dataType, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	if (dataType == GL_RGBA16F )
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, dataType, width, height, 0, GL_RGBA, GL_UNSIGNED_SHORT, NULL);
+	}
+	else 
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, dataType, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, colorBuffer, 0);
 
-	mDrawBuffers.push(attachment);
+	mDrawBuffers.push_back(attachment);
 	mBuffer.insert(std::pair<std::string, GLuint>(bufferName, colorBuffer));
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -48,10 +55,11 @@ void FBO::Finish()
 	{
 		GLenum* buffers = new GLenum[nCount];
 		int i = 0;
-		while (!mDrawBuffers.empty())
+		while (i<nCount)
 		{
-			buffers[i++] = mDrawBuffers.top();
-			mDrawBuffers.pop();
+			/*buffers[i++] = mDrawBuffers.top();
+			mDrawBuffers.pop();*/
+			buffers[i++] = mDrawBuffers[i];
 		}
 		glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 		glDrawBuffers(nCount, buffers);
