@@ -134,6 +134,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	gaussianProgram.LinkProgram();
 	gaussianProgram.InitializeLocation();
 
+	GPUProgram easyGaussianProgram;
+	easyGaussianProgram.AttachShader(GL_VERTEX_SHADER,"res/shader/fullscreen.vs");
+	easyGaussianProgram.AttachShader(GL_FRAGMENT_SHADER,"res/shader/blur/easy_gaussian.fs");
+	easyGaussianProgram.LinkProgram();
+	easyGaussianProgram.InitializeLocation();
+
 	FullScreenQuad fullscreen;
 	fullscreen.Init(); 
 
@@ -283,7 +289,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	{
 		glUseProgram(gaussianProgram.mProgram);
 		glActiveTexture(GL_TEXTURE0);
-		GLuint cb = fbo2.GetBuffer("color");
+		GLuint cb = fbo1.GetBuffer("color");
 		glBindTexture(GL_TEXTURE_2D, cb);
 		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
 		fullscreen.Draw(gaussianProgram.GetLocation(VERTEX), gaussianProgram.GetLocation(TEXCOORD), new Rect(-1.0f,0.0f,0.0f,-1.0f));
@@ -292,12 +298,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	auto renderBottomRight = [&](void) 
 	{
-		glUseProgram(gaussianProgram.mProgram);
+		glUseProgram(easyGaussianProgram.mProgram);
 		glActiveTexture(GL_TEXTURE0);
-		GLuint cb = fbo3.GetBuffer("color");
+		GLuint cb = fbo.GetBuffer("color");
 		glBindTexture(GL_TEXTURE_2D, cb);
-		glUniform1i(gaussianProgram.GetLocation(MAIN_TEXTURE),0);
-		fullscreen.Draw(gaussianProgram.GetLocation(VERTEX),gaussianProgram.GetLocation(TEXCOORD),new Rect(0.0f,1.0f,0.0f,-1.0f));
+		glUniform1i(easyGaussianProgram.GetLocation(MAIN_TEXTURE),0);
+		fullscreen.Draw(easyGaussianProgram.GetLocation(VERTEX), easyGaussianProgram.GetLocation(TEXCOORD),new Rect(0.0f,1.0f,0.0f,-1.0f));
 		glUseProgram(0);
 	};
 
