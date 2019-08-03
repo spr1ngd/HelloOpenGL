@@ -4,7 +4,7 @@ varying vec2 V_Texcoord;
 
 void main()
 {
-    float texelOffset = 1/100.0;
+    float texelOffset = 1/200.0;
     float weight[5] = float[](0.22,0.19,0.12,0.08,0.01);
     // vec4 color = vec4(0.0);
     vec4 color = texture2D(U_MainTexture,V_Texcoord) * weight[0];

@@ -12,7 +12,7 @@ void main()
 
     vec4 color = vec4(0.0);
     int coreSize = 3;
-    float texelOffset = 1/350.0;
+    float texelOffset = 1/200.0;
 
     int kernelIndex = 0;
     for( int y = 0 ; y < coreSize;y++ ) 

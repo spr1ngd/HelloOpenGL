@@ -60,7 +60,7 @@ void main()
     vec3 viewDir = normalize(U_LightPos.xyz-V_WorldPos.xyz);
     vec3 halfDir = normalize(viewDir+L);
     // vec4 reflectColor = U_SpecularColor * U_SpecularMaterial * pow(max(0.0,dot(reflectDir,viewDir)),32);
-    float specularIntensity = pow( max(0.0,dot(halfDir,N)),64);
+    float specularIntensity = pow( max(0.0,dot(halfDir,N)),4);
     vec4 reflectColor =  U_SpecularColor * U_SpecularMaterial * specularIntensity * attenuation;
 
     vec4 finalColor = U_AmbientColor + diffuseColor + reflectColor;
