@@ -116,6 +116,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	fsProgram.LinkProgram();
 	fsProgram.InitializeLocation();
 
+	GPUProgram erosionProgram;
+	erosionProgram.AttachShader(GL_VERTEX_SHADER,"res/shader/fullscreen.vs");
+	erosionProgram.AttachShader(GL_FRAGMENT_SHADER,"res/shader/erosion.fs");
+	erosionProgram.LinkProgram();
+	erosionProgram.InitializeLocation();
+
+	GPUProgram dilationProgram;
+	dilationProgram.AttachShader(GL_VERTEX_SHADER,"res/shader/fullscreen.vs");
+	dilationProgram.AttachShader(GL_FRAGMENT_SHADER,"res/shader/dilation.fs");
+	dilationProgram.LinkProgram();
+	dilationProgram.InitializeLocation();
+
 	FullScreenQuad fullscreen;
 	fullscreen.Init(); 
 
@@ -230,10 +242,39 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
 		GLuint posLocation = fsProgram.GetLocation(VERTEX);
 		GLuint texcoordLocation = fsProgram.GetLocation(TEXCOORD); // ISSUE: GET TEXCOORD LOCATION ERROR.
-		fullscreen.Draw(posLocation, texcoordLocation/*,new Rect(-1.0f,0.0f,1.0f,0.0f)*/);
+		fullscreen.Draw(posLocation, texcoordLocation,new Rect(-1.0f,0.0f,1.0f,0.0f));
 		//glBindBuffer(GL_ARRAY_BUFFER,0);
 		glUseProgram(0);
 		//glFinish();
+	}; 
+
+	auto renderTopRight = [&](void) 
+	{
+		glUseProgram(erosionProgram.mProgram);
+		glEnable(GL_BLEND);
+		glActiveTexture(GL_TEXTURE0);
+		GLuint cb = fbo.GetBuffer("color");
+		glBindTexture(GL_TEXTURE_2D, cb);
+		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
+		fullscreen.Draw(erosionProgram.GetLocation(VERTEX),erosionProgram.GetLocation(TEXCOORD),new Rect(0.0f,1.0f,1.0f,0.0f));
+		glUseProgram(0);
+	};
+
+	auto renderBottomLeft = [&](void) 
+	{
+		glUseProgram(dilationProgram.mProgram);
+		glEnable(GL_BLEND);
+		glActiveTexture(GL_TEXTURE0);
+		GLuint cb = fbo.GetBuffer("color");
+		glBindTexture(GL_TEXTURE_2D, cb);
+		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
+		fullscreen.Draw(dilationProgram.GetLocation(VERTEX), dilationProgram.GetLocation(TEXCOORD), new Rect(-1.0f,0.0f,0.0f,-1.0f));
+		glUseProgram(0);
+	};
+
+	auto renderBottomRight = [&](void) 
+	{
+
 	};
 
 	glEnable(GL_CULL_FACE); 
@@ -252,21 +293,24 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			DispatchMessage(&msg);
 		}
 
-		//fbo.Bind();
-		glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
-		//glClearColor(0.0f, 0.0f, 0.0f,1.0f);
+		fbo.Bind();
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		//glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_DEPTH_TEST);
 		render();
-		//fbo.Unbind();
+		fbo.Unbind();
 
-		//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		/*glDisable(GL_BLEND);
-		glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
+		glDisable(GL_BLEND);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		//glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-		fsRender();*/
+		fsRender();
+		renderTopRight();
+		renderBottomLeft();
+		//renderBottomRight();
 		glFinish();
 		SwapBuffers(dc);
 	}
