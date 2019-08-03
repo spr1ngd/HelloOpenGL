@@ -9,10 +9,10 @@ void FullScreenQuad::Draw(GLuint posLocation,GLuint texcoordLocation)
 {
 	float pos[] =
 	{
-		-0.5f,-0.5f,0.0f ,0.0f,0.0f,
-		0.5f ,-0.5f,0.0f ,1.0f,0.0f,
-		0.5f ,0.5f ,0.0f ,1.0f,1.0f,
-		-0.5f,0.5f ,0.0f ,0.0f,1.0f
+		-1.0f,-1.0f,0.0f ,0.0f,0.0f,
+		1.0f ,-1.0f,0.0f ,1.0f,0.0f,
+		1.0f ,1.0f ,0.0f ,1.0f,1.0f,
+		-1.0f,1.0f ,0.0f ,0.0f,1.0f
 	};
 	glGenBuffers(1, &mVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
