@@ -107,8 +107,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	unsigned int* indices = nullptr;
 	int indexCount, vertexCount;
 	VertexData* vertices = LoadObjModel("res/model/Sphere.obj", &indices, indexCount, vertexCount);
-	Texture* texture = Texture::LoadTexture("res/texture/fur.jpg");
-	Texture* secondTex = Texture::LoadTexture("res/texture/carbon_fiber.jpg");
+	Texture* texture = Texture::LoadTexture("res/texture/flower.jpg");
+	Texture* secondTex = Texture::LoadTexture("res/texture/earth.bmp");
 
 	GPUProgram fsProgram; 
 	fsProgram.AttachShader(GL_VERTEX_SHADER, "res/shader/fullscreen.vs");
@@ -149,19 +149,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	GPUProgram TLProgram;
 	TLProgram.AttachShader(GL_VERTEX_SHADER,"res/shader/fullscreen.vs");
-	TLProgram.AttachShader(GL_FRAGMENT_SHADER,"res/shader/image/add.fs");
+	TLProgram.AttachShader(GL_FRAGMENT_SHADER,"res/shader/image/smoothness.fs");
 	TLProgram.LinkProgram();
 	TLProgram.InitializeLocation();
 
 	GPUProgram TRProgram;
 	TRProgram.AttachShader(GL_VERTEX_SHADER, "res/shader/fullscreen.vs");
-	TRProgram.AttachShader(GL_FRAGMENT_SHADER, "res/shader/fullscreen.fs");
+	TRProgram.AttachShader(GL_FRAGMENT_SHADER, "res/shader/image/edge_detect.fs");
 	TRProgram.LinkProgram();
 	TRProgram.InitializeLocation();
 
 	GPUProgram BLProgram;
 	BLProgram.AttachShader(GL_VERTEX_SHADER, "res/shader/fullscreen.vs");
-	BLProgram.AttachShader(GL_FRAGMENT_SHADER, "res/shader/fullscreen.fs");
+	BLProgram.AttachShader(GL_FRAGMENT_SHADER, "res/shader/image/sharpen.fs");
 	BLProgram.LinkProgram();
 	BLProgram.InitializeLocation();
 
@@ -297,13 +297,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	auto renderTopLeft = [&](void) 
 	{
 		glUseProgram(TLProgram.mProgram);
-		glDisable(GL_DEPTH_TEST);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture->mTextureID); 
+		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
+		glUniform1i(TLProgram.GetLocation(MAIN_TEXTURE), 0);
 
-		glActiveTexture(GL_TEXTURE1);
+	/*	glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, secondTex->mTextureID);
+		glUniform1i(TLProgram.GetLocation(SECOND_TEXTURE),1);*/
 
 		fullscreen.Draw(TLProgram.GetLocation(VERTEX), TLProgram.GetLocation(TEXCOORD),new Rect(-1.0f,0.0f,1.0f,0.0f));
 		glUseProgram(0);
@@ -311,46 +312,49 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	auto renderTopRight = [&](void) 
 	{
-		glUseProgram(TLProgram.mProgram);
-		glDisable(GL_DEPTH_TEST);
+		glUseProgram(TRProgram.mProgram);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
+		glUniform1i(TRProgram.GetLocation(MAIN_TEXTURE), 0);
 
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, secondTex->mTextureID);
+		//glActiveTexture(GL_TEXTURE1);
+		//glBindTexture(GL_TEXTURE_2D, secondTex->mTextureID);
+		//glUniform1i(TRProgram.GetLocation(SECOND_TEXTURE), 1);
 
-		fullscreen.Draw(TLProgram.GetLocation(VERTEX), TLProgram.GetLocation(TEXCOORD), new Rect(-1.0f, 0.0f, 1.0f, 0.0f));
+		fullscreen.Draw(TRProgram.GetLocation(VERTEX), TRProgram.GetLocation(TEXCOORD), new Rect(0.0f, 1.0f, 1.0f, 0.0f));
 		glUseProgram(0);
 	};
 
 	auto renderBottomLeft = [&](void) 
 	{
-		glUseProgram(TLProgram.mProgram);
-		glDisable(GL_DEPTH_TEST);
+		glUseProgram(BLProgram.mProgram);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
+		glUniform1i(BLProgram.GetLocation(MAIN_TEXTURE), 0);
 
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, secondTex->mTextureID);
+		//glActiveTexture(GL_TEXTURE1);
+		//glBindTexture(GL_TEXTURE_2D, secondTex->mTextureID);
+		//glUniform1i(BLProgram.GetLocation(SECOND_TEXTURE), 1);
 
-		fullscreen.Draw(TLProgram.GetLocation(VERTEX), TLProgram.GetLocation(TEXCOORD), new Rect(-1.0f, 0.0f, 1.0f, 0.0f));
+		fullscreen.Draw(BLProgram.GetLocation(VERTEX), BLProgram.GetLocation(TEXCOORD), new Rect(-1.0f, 0.0f, 0.0f, -1.0f));
 		glUseProgram(0);
 	};
 
 	auto renderBottomRight = [&](void) 
 	{ 
-		glUseProgram(TLProgram.mProgram);
-		glDisable(GL_DEPTH_TEST);
+		glUseProgram(BRProgram.mProgram);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
+		glUniform1i(BRProgram.GetLocation(MAIN_TEXTURE), 0);
 
-		glActiveTexture(GL_TEXTURE1);
+	/*	glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, secondTex->mTextureID);
+		glUniform1i(BRProgram.GetLocation(SECOND_TEXTURE), 1);*/
 
-		fullscreen.Draw(TLProgram.GetLocation(VERTEX), TLProgram.GetLocation(TEXCOORD), new Rect(-1.0f, 0.0f, 1.0f, 0.0f));
+		fullscreen.Draw(BRProgram.GetLocation(VERTEX), BRProgram.GetLocation(TEXCOORD), new Rect(0.0f, 1.0f, 0.0f, -1.0f));
 		glUseProgram(0);
 	};
 
@@ -413,6 +417,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		//glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
 		// top left
 		renderTopLeft();
