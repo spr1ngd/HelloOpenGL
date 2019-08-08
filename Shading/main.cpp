@@ -78,8 +78,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	height = rect.bottom - rect.top;
 
 	// create GPU program
-	GLuint program = CreateGPUProgram("res/shader/light.vs", 
-									  "res/shader/light/hdr_light.fs");
+	GLuint program = CreateGPUProgram("res/shader/fog/fog.vs", 
+									  "res/shader/fog/fog_exp.fs");
 	GLuint MLocation, VLocation, PLocation,NMLocation, vertexLocation, normalLocation, texcoordLocation,MainTextureLocation,SecondTextureLocation;
 	vertexLocation = glGetAttribLocation(program, "vertex");
 	normalLocation = glGetAttribLocation(program, "normal");
@@ -103,10 +103,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	GLuint specularMaterialLocation = glGetUniformLocation(program,"U_SpecularMaterial");
 	GLuint ambientColorLocation = glGetUniformLocation(program,"U_AmbientColor");
 
+	GLuint fogColorLocation = glGetUniformLocation(program, "U_FogColor");
+	GLuint fogDistanceLocation = glGetUniformLocation(program,"U_FogDistance");
+	GLuint fogDensityLocation = glGetUniformLocation(program,"U_FogDensity");
+	
+
 	// load cube model
 	unsigned int* indices = nullptr;
 	int indexCount, vertexCount;
-	VertexData* vertices = LoadObjModel("res/model/Sphere.obj", &indices, indexCount, vertexCount);
+	VertexData* vertices = LoadObjModel("res/model/cube.obj", &indices, indexCount, vertexCount);
 	Texture* texture = Texture::LoadTexture("res/texture/flower.jpg");
 	Texture* secondTex = Texture::LoadTexture("res/texture/earth.bmp");
 
@@ -115,37 +120,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	fsProgram.AttachShader(GL_FRAGMENT_SHADER,"res/shader/fullscreen.fs");
 	fsProgram.LinkProgram();
 	fsProgram.InitializeLocation();
-
-	GPUProgram erosionProgram;
-	erosionProgram.AttachShader(GL_VERTEX_SHADER,"res/shader/fullscreen.vs");
-	erosionProgram.AttachShader(GL_FRAGMENT_SHADER,"res/shader/erosion.fs");
-	erosionProgram.LinkProgram();
-	erosionProgram.InitializeLocation();
-
-	GPUProgram dilationProgram;
-	dilationProgram.AttachShader(GL_VERTEX_SHADER,"res/shader/fullscreen.vs");
-	dilationProgram.AttachShader(GL_FRAGMENT_SHADER,"res/shader/dilation.fs");
-	dilationProgram.LinkProgram();
-	dilationProgram.InitializeLocation();
-
-	GPUProgram gaussianProgram;
-	gaussianProgram.AttachShader(GL_VERTEX_SHADER,"res/shader/fullscreen.vs");
-	gaussianProgram.AttachShader(GL_FRAGMENT_SHADER,"res/shader/blur/gaussian.fs");
-	gaussianProgram.LinkProgram();
-	gaussianProgram.InitializeLocation();
-
-	GPUProgram easyGaussianProgram;
-	easyGaussianProgram.AttachShader(GL_VERTEX_SHADER,"res/shader/fullscreen.vs");
-	easyGaussianProgram.AttachShader(GL_FRAGMENT_SHADER,"res/shader/blur/easy_gaussian.fs");
-	easyGaussianProgram.LinkProgram();
-	easyGaussianProgram.InitializeLocation();
-
-	GPUProgram hdrProgram;
-	hdrProgram.AttachShader(GL_VERTEX_SHADER,"res/shader/fullscreen.vs");
-	hdrProgram.AttachShader(GL_FRAGMENT_SHADER,"res/shader/hdr/hdr_composite.fs");
-	hdrProgram.LinkProgram();
-	hdrProgram.InitializeLocation();
-	hdrProgram.DetectUniform("U_HDRTetxure");
 
 	GPUProgram TLProgram;
 	TLProgram.AttachShader(GL_VERTEX_SHADER,"res/shader/fullscreen.vs");
@@ -222,15 +196,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	ShowWindow(hwnd, SW_SHOW);
 	UpdateWindow(hwnd); 
 
-	glm::mat4 MODEL = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f)) * glm::rotate(glm::mat4(1.0f), 30.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 MODEL0 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f)) * glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 MODEL1 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -9.0f)) * glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 MODEL2 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -15.0f)) * glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		//*glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f));
 	glm::mat4 PROJECTION = glm::perspective(45.0f, float(width) / (float)height, 0.1f, 200.0f);
 	glm::mat4 ORTHO = glm::ortho(-width/2.0f, width/2.0f, -height/2.0f, height/2.0f);
-	glm::mat4 VIEW = glm::mat4(1.0f);
-	glm::mat4 NM = glm::inverseTranspose(MODEL);
+	//glm::mat4 VIEW = glm::mat4(1.0f);
+	
+	glm::mat4 NM = glm::inverseTranspose(MODEL0);
 
-	float viewPos[] = {2.0f,2.0f,-2.0f};
-
+	float viewPos[] = {3.0f,2.0f,2.0f};
+	glm::mat4 VIEW = glm::lookAt(glm::vec3(3.0f, 2.0f, 2.0f), glm::vec3(0.0f,0.0f,-3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	// LIGHT SETTING
 	float lightPos[] = {2.0f,2.0f,3.0f,0.0f};
 	// float lightPos[] = {0.0f,5.0f,-2.0f,1.0f};
@@ -246,16 +223,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	// DIFFUSE SETTING
 	float materialColor[] = {0.4f,0.4f,0.4f,1.0f};
-	float diffuseColor[] = {0.5f,0.5f,0.5f,1.0f};
+	float diffuseColor[] = {0.2f,0.8f,0.9f,1.0f};
 
 	// SPECULAR SETTING
 	float specularColor[] = { 0.75f,0.75f,0.75f,1.0f };
 	float specularMaterialColor[] = {1.0f,1.0f,1.0f,1.0f};
 
+	// FOG SETTING
+	float fogColor[] = {0.6f,0.6f,0.6f,1.0f};
+	float fogDistance[] = {0.0f,30.0f,0.0f,0.0f};
+	float fogDensity = 0.1f;
+
 	auto render = [&](void)
 	{ 
 		glUseProgram(program);
-		glUniformMatrix4fv(MLocation, 1, GL_FALSE, glm::value_ptr(MODEL));
+		glUniformMatrix4fv(MLocation, 1, GL_FALSE, glm::value_ptr(MODEL0));
 		glUniformMatrix4fv(VLocation, 1, GL_FALSE, glm::value_ptr(VIEW));
 		glUniformMatrix4fv(PLocation, 1, GL_FALSE, glm::value_ptr(PROJECTION));
 		glUniformMatrix4fv(NMLocation, 1, GL_FALSE,glm::value_ptr(NM));
@@ -275,6 +257,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUniform4fv(specularColorLocation,1,specularColor);
 		glUniform4fv(specularMaterialLocation,1,specularMaterialColor);
 
+		glUniform4fv(fogColorLocation,1,fogColor);
+		glUniform4fv(fogDistanceLocation,1,fogDistance);
+		glUniform1f(fogDensityLocation, fogDensity);
+
 		// bind ibo
 		glBindVertexArray(vao);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ibo);
@@ -287,6 +273,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glBindTexture(GL_TEXTURE_2D, secondTex->mTextureID);
 		glUniform1i(SecondTextureLocation,1);*/
  
+		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
+		glBindVertexArray(0);
+
+		glUniformMatrix4fv(MLocation, 1, GL_FALSE, glm::value_ptr(MODEL1));
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
+		glBindVertexArray(0);
+
+		glUniformMatrix4fv(MLocation, 1, GL_FALSE, glm::value_ptr(MODEL2));
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
 		glBindVertexArray(0);
 
@@ -374,64 +372,28 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			DispatchMessage(&msg);
 		}
 
-		//fbo.Bind();
-		//hdrFBO.Bind();
-		//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	/*	glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);*/
-		/*glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-		glEnable(GL_DEPTH_TEST);*/
-		/*render();
-		hdrFBO.Unbind();*/
-		//fbo.Unbind();
-
-	/*	fbo1.Bind();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glUseProgram(gaussianProgram.mProgram);
-		glBindTexture(GL_TEXTURE_2D, fbo.GetBuffer("color"));
-		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
-		fullscreen.Draw(gaussianProgram.GetLocation(VERTEX), gaussianProgram.GetLocation(TEXCOORD));
-		glUseProgram(0);
-		fbo1.Unbind();
-
-		fbo2.Bind();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glUseProgram(gaussianProgram.mProgram);
-		glBindTexture(GL_TEXTURE_2D, fbo1.GetBuffer("color"));
-		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
-		fullscreen.Draw(gaussianProgram.GetLocation(VERTEX), gaussianProgram.GetLocation(TEXCOORD));
-		glUseProgram(0);
-		fbo2.Unbind();
-
-		fbo3.Bind();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glUseProgram(gaussianProgram.mProgram);
-		glBindTexture(GL_TEXTURE_2D, fbo2.GetBuffer("color"));
-		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
-		fullscreen.Draw(gaussianProgram.GetLocation(VERTEX), gaussianProgram.GetLocation(TEXCOORD));
-		glUseProgram(0);
-		fbo3.Unbind();*/
-
 		glDisable(GL_BLEND);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
 		//glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
-		// top left
-		renderTopLeft();
+		render();
 
-		// top right
-		renderTopRight();
+		//// top left
+		//renderTopLeft();
 
-		// bottom left
-		renderBottomLeft();
+		//// top right
+		//renderTopRight();
 
-		// bottom right
-		renderBottomRight();
+		//// bottom left
+		//renderBottomLeft();
+
+		//// bottom right
+		//renderBottomRight();
 
 		glFinish();
 		SwapBuffers(dc);
