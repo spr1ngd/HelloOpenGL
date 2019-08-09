@@ -146,6 +146,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	BRProgram.LinkProgram();
 	BRProgram.InitializeLocation();
 
+	GPUProgram skyboxProgram;
+	skyboxProgram.AttachShader(GL_VERTEX_SHADER,"res/shader/skybox/skybox.vs");
+	skyboxProgram.AttachShader(GL_FRAGMENT_SHADER,"res/shader/skybox/skybox.fs");
+	skyboxProgram.LinkProgram();
+	skyboxProgram.InitializeLocation();
+	skyboxProgram.DetectUniform("U_EyePos");
+
 	FullScreenQuad fullscreen;
 	fullscreen.Init(); 
 
@@ -359,6 +366,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUseProgram(0);
 	};
 
+	auto renderSkybox = [&](void) 
+	{
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		glClearColor(0.0f,0.0f,0.0f,0.0f);
+		glDisable(GL_DEPTH_TEST);
+
+		glUseProgram(skyboxProgram.mProgram);
+
+		glUniformMatrix4fv(skyboxProgram.GetLocation("M"),1,GL_FALSE,glm::value_ptr(glm::vec4(1.0f)));
+		glUniformMatrix4fv(skyboxProgram.GetLocation("V"),1,GL_FALSE,glm::value_ptr(glm::vec4(1.0f)));
+		glUniformMatrix4fv(skyboxProgram.GetLocation("P"),1,GL_FALSE,glm::value_ptr(glm::vec4(1.0f)));
+
+		glUniform3fv(skyboxProgram.GetLocation("U_EyePos"),1, viewPos);
+
+		glUseProgram(0);
+	};
+
 	glEnable(GL_CULL_FACE); 
 	glEnable(GL_DEPTH_TEST); 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -374,6 +398,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+
+		renderSkybox();
 
 		glDisable(GL_BLEND);
 		//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
