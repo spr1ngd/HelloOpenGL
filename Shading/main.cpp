@@ -79,7 +79,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	// create GPU program
 	GLuint program = CreateGPUProgram("res/shader/fog/fog.vs", 
-									  "res/shader/fog/fog_exp.fs");
+									  "res/shader/fog/fog_exp2.fs");
 	GLuint MLocation, VLocation, PLocation,NMLocation, vertexLocation, normalLocation, texcoordLocation,MainTextureLocation,SecondTextureLocation;
 	vertexLocation = glGetAttribLocation(program, "vertex");
 	normalLocation = glGetAttribLocation(program, "normal");
@@ -106,6 +106,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	GLuint fogColorLocation = glGetUniformLocation(program, "U_FogColor");
 	GLuint fogDistanceLocation = glGetUniformLocation(program,"U_FogDistance");
 	GLuint fogDensityLocation = glGetUniformLocation(program,"U_FogDensity");
+	GLuint fogGradientLocation = glGetUniformLocation(program,"U_FogGradient");
 	
 
 	// load cube model
@@ -233,6 +234,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	float fogColor[] = {0.6f,0.6f,0.6f,1.0f};
 	float fogDistance[] = {0.0f,30.0f,0.0f,0.0f};
 	float fogDensity = 0.1f;
+	float fogGradient = 2.0f;
 
 	auto render = [&](void)
 	{ 
@@ -260,6 +262,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUniform4fv(fogColorLocation,1,fogColor);
 		glUniform4fv(fogDistanceLocation,1,fogDistance);
 		glUniform1f(fogDensityLocation, fogDensity);
+		glUniform1f(fogGradientLocation,fogGradient);
 
 		// bind ibo
 		glBindVertexArray(vao);
