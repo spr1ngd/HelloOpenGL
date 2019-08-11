@@ -93,3 +93,9 @@ void Texture::UnLoadTexture(Texture*texture)
 		delete texture;
 	}
 }
+
+unsigned int Texture::LoadSkyboxTextures(const char* texturePath)
+{
+	unsigned int cubemap = SOIL_load_OGL_cubemap("right.png", "left.png", "top.png", "bottom.png", "forward.png", "back.png",0,0,SOIL_FLAG_POWER_OF_TWO);
+	return cubemap;
+}

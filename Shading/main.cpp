@@ -115,6 +115,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	VertexData* vertices = LoadObjModel("res/model/cube.obj", &indices, indexCount, vertexCount);
 	Texture* texture = Texture::LoadTexture("res/texture/flower.jpg");
 	Texture* secondTex = Texture::LoadTexture("res/texture/earth.bmp");
+	unsigned int cubemap = Texture::LoadSkyboxTextures("res/texture/skybox/");
 
 	GPUProgram fsProgram; 
 	fsProgram.AttachShader(GL_VERTEX_SHADER, "res/shader/fullscreen.vs");
@@ -379,6 +380,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUniformMatrix4fv(skyboxProgram.GetLocation("P"),1,GL_FALSE,glm::value_ptr(glm::vec4(1.0f)));
 
 		glUniform3fv(skyboxProgram.GetLocation("U_EyePos"),1, viewPos);
+
+		glBindVertexArray(vao);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, cubemap);
+		glUniform1i(skyboxProgram.GetLocation("MAIN_TEXTURE"), 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
+		glBindVertexArray(0);
 
 		glUseProgram(0);
 	};
