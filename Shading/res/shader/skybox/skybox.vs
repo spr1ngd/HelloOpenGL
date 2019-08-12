@@ -10,6 +10,6 @@ varying vec3 V_Texcoord;
 
 void main()
 {
-    V_Texcoord = U_EyePos;
+    V_Texcoord = vertex;
     gl_Position = P * M * V * vec4(vertex,1.0);
 }

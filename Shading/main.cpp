@@ -115,7 +115,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	VertexData* vertices = LoadObjModel("res/model/cube.obj", &indices, indexCount, vertexCount);
 	Texture* texture = Texture::LoadTexture("res/texture/flower.jpg");
 	Texture* secondTex = Texture::LoadTexture("res/texture/earth.bmp");
-	unsigned int cubemap = Texture::LoadSkyboxTextures("res/texture/skybox/");
+	unsigned int cubemap = Texture::LoadSkyboxTextures("res/texture/skybox/Default/");
 
 	GPUProgram fsProgram; 
 	fsProgram.AttachShader(GL_VERTEX_SHADER, "res/shader/fullscreen.vs");
@@ -205,14 +205,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	ShowWindow(hwnd, SW_SHOW);
 	UpdateWindow(hwnd); 
 
-	glm::mat4 MODEL0 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f)) * glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 MODEL0 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));// *glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 MODEL1 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -9.0f)) * glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 MODEL2 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -15.0f)) * glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-		//*glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f));
 	glm::mat4 PROJECTION = glm::perspective(45.0f, float(width) / (float)height, 0.1f, 200.0f);
 	glm::mat4 ORTHO = glm::ortho(-width/2.0f, width/2.0f, -height/2.0f, height/2.0f);
-	//glm::mat4 VIEW = glm::mat4(1.0f);
-	
 	glm::mat4 NM = glm::inverseTranspose(MODEL0);
 
 	float viewPos[] = {3.0f,2.0f,2.0f};
@@ -368,23 +365,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	};
 
 	auto renderSkybox = [&](void) 
-	{
-		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-		glClearColor(0.0f,0.0f,0.0f,0.0f);
+	{ 
 		glDisable(GL_DEPTH_TEST);
 
 		glUseProgram(skyboxProgram.mProgram);
 
-		glUniformMatrix4fv(skyboxProgram.GetLocation("M"),1,GL_FALSE,glm::value_ptr(glm::vec4(1.0f)));
-		glUniformMatrix4fv(skyboxProgram.GetLocation("V"),1,GL_FALSE,glm::value_ptr(glm::vec4(1.0f)));
-		glUniformMatrix4fv(skyboxProgram.GetLocation("P"),1,GL_FALSE,glm::value_ptr(glm::vec4(1.0f)));
+		glUniformMatrix4fv(skyboxProgram.GetLocation("M"),1,GL_FALSE,glm::value_ptr(MODEL0));
+		glUniformMatrix4fv(skyboxProgram.GetLocation("V"),1,GL_FALSE,glm::value_ptr(VIEW));
+		glUniformMatrix4fv(skyboxProgram.GetLocation("P"),1,GL_FALSE,glm::value_ptr(PROJECTION));
 
 		glUniform3fv(skyboxProgram.GetLocation("U_EyePos"),1, viewPos);
 
 		glBindVertexArray(vao);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, cubemap);
+		//glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap);
 		glUniform1i(skyboxProgram.GetLocation("MAIN_TEXTURE"), 0);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
@@ -410,18 +405,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			DispatchMessage(&msg);
 		}
 
+		glClearColor(0.1f, 0.4f, 0.7f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		renderSkybox();
 
-		glDisable(GL_BLEND);
-		//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
-		//glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		//glDisable(GL_BLEND);
+		////glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		//glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
+		////glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
+		//glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+		//glEnable(GL_BLEND);
+		//glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
-		render();
+		//render();
 
 		//// top left
 		//renderTopLeft();

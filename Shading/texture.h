@@ -16,7 +16,7 @@ public:
 	static void UnLoadTexture(Texture* texture);
 	static std::unordered_map<std::string, Texture*> mCachedTextures;
 
-	// skybox
+	// sky box
 	static unsigned int LoadSkyboxTextures(const char*texturePath);
 };
 

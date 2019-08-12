@@ -1,7 +1,8 @@
 
 #include "soil.h"
 #include "texture.h"
-#include "util.h"
+#include "util.h" 
+#include <iostream>
 
 #pragma comment(lib,"soil.lib")
 unsigned char* DecodeBMP( unsigned char*bmpFileData ,int&width,int&height) 
@@ -96,6 +97,13 @@ void Texture::UnLoadTexture(Texture*texture)
 
 unsigned int Texture::LoadSkyboxTextures(const char* texturePath)
 {
-	unsigned int cubemap = SOIL_load_OGL_cubemap("right.png", "left.png", "top.png", "bottom.png", "forward.png", "back.png",0,0,SOIL_FLAG_POWER_OF_TWO);
+	unsigned int cubemap = SOIL_load_OGL_cubemap(
+		"res/texture/skybox/Default/right.png", 
+		"res/texture/skybox/Default/left.png", 
+		"res/texture/skybox/Default/top.png", 
+		"res/texture/skybox/Default/bottom.png", 
+		"res/texture/skybox/Default/back.png",
+		"res/texture/skybox/Default/front.png", 
+		0,0,SOIL_FLAG_POWER_OF_TWO);
 	return cubemap;
 }
