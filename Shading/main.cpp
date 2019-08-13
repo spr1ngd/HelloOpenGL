@@ -154,6 +154,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	skyboxProgram.InitializeLocation();
 	skyboxProgram.DetectUniform("U_EyePos");
 
+	GPUProgram cubemapReflection;
+	cubemapReflection.AttachShader(GL_VERTEX_SHADER, "res/shader/skybox/cubemap_reflection.vs");
+	cubemapReflection.AttachShader(GL_FRAGMENT_SHADER, "res/shader/skybox/cubemap_reflection.fs");
+	cubemapReflection.LinkProgram();
+	cubemapReflection.InitializeLocation();
+
 	FullScreenQuad fullscreen;
 	fullscreen.Init(); 
 
@@ -187,12 +193,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	{
 		GLuint vbo = CreateBufferObject(GL_ARRAY_BUFFER, sizeof(VertexData) * vertexCount, GL_STATIC_DRAW, vertices);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
 		glEnableVertexAttribArray(vertexLocation);
 		glVertexAttribPointer(vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)0);
+
 		glEnableVertexAttribArray(normalLocation);
 		glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 3));
+
 		glEnableVertexAttribArray(texcoordLocation);
 		glVertexAttribPointer(texcoordLocation,2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 6));
+
 	/*	program.EnableVertexAttrib(VERTEX, 3, sizeof(VertexData), (void*)0);
 		program.EnableVertexAttrib(NORMAL,3,sizeof(VertexData),(void*)(sizeof(float) *3));
 		program.EnableVertexAttrib(TEXCOORD,2,sizeof(VertexData),(void*)(sizeof(float) * 6));*/
@@ -205,15 +215,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	ShowWindow(hwnd, SW_SHOW);
 	UpdateWindow(hwnd); 
 
-	glm::mat4 MODEL0 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));// *glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 MODEL0 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) *glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 MODEL1 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -9.0f)) * glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 MODEL2 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -15.0f)) * glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 PROJECTION = glm::perspective(45.0f, float(width) / (float)height, 0.1f, 200.0f);
 	glm::mat4 ORTHO = glm::ortho(-width/2.0f, width/2.0f, -height/2.0f, height/2.0f);
 	glm::mat4 NM = glm::inverseTranspose(MODEL0);
 
-	float viewPos[] = {3.0f,2.0f,2.0f};
-	glm::mat4 VIEW = glm::lookAt(glm::vec3(3.0f, 2.0f, 2.0f), glm::vec3(0.0f,0.0f,-3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	float viewPos[] = {0.0f,0.0f,.0f};
+	//glm::mat4 VIEW = glm::mat4(1.0);
+	glm::mat4 VIEW = glm::lookAt(glm::vec3(0.0f, 0.0f,0.0f), glm::vec3(0.0f,0.0f,-1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	// LIGHT SETTING
 	float lightPos[] = {2.0f,2.0f,3.0f,0.0f};
 	// float lightPos[] = {0.0f,5.0f,-2.0f,1.0f};
@@ -284,17 +295,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
 		glBindVertexArray(0);
 
-		glUniformMatrix4fv(MLocation, 1, GL_FALSE, glm::value_ptr(MODEL1));
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
-		glBindVertexArray(0);
+		/*	glUniformMatrix4fv(MLocation, 1, GL_FALSE, glm::value_ptr(MODEL1));
+			glBindVertexArray(vao);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+			glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
+			glBindVertexArray(0);
 
-		glUniformMatrix4fv(MLocation, 1, GL_FALSE, glm::value_ptr(MODEL2));
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
-		glBindVertexArray(0);
+			glUniformMatrix4fv(MLocation, 1, GL_FALSE, glm::value_ptr(MODEL2));
+			glBindVertexArray(vao);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+			glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
+			glBindVertexArray(0);*/
 
 		glUseProgram(0);
 		glFinish();
@@ -389,8 +400,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUseProgram(0);
 	};
 
-	glEnable(GL_CULL_FACE); 
-	glEnable(GL_DEPTH_TEST); 
+	auto renderCubemapReflection = [&](void)
+	{
+		glUseProgram(cubemapReflection.mProgram);
+
+		// draw cubeamp reflection.
+
+		glUseProgram(0);
+	};
+
+	//glEnable(GL_CULL_FACE); 
+	//glEnable(GL_DEPTH_TEST); 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	while (true) 
@@ -407,6 +427,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 		glClearColor(0.1f, 0.4f, 0.7f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glDisable(GL_DEPTH_TEST);
 		renderSkybox();
 
 		//glDisable(GL_BLEND);

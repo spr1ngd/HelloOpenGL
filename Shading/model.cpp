@@ -133,3 +133,40 @@ VertexData* LoadObjModel(const char* filePath, unsigned int** indices, int& inde
 	}
 	return nullptr;
 }
+
+void DrawModel( const char* filePath , GPUProgram program ,void* func() )   
+{
+	unsigned int* indices = nullptr;
+	int indexCount, vertexCount;
+	VertexData* vertices = LoadObjModel(filePath, &indices, indexCount, vertexCount);
+
+	// create vao
+	GLuint vao = CreateVAO([&](void)
+	{
+		GLuint vbo = CreateBufferObject(GL_ARRAY_BUFFER, sizeof(VertexData) * vertexCount, GL_STATIC_DRAW, vertices);
+		// bind vbo
+		
+		glBindBuffer(GL_ARRAY_BUFFER,vbo);
+
+		glEnableVertexAttribArray(program.GetLocation(VERTEX));
+		glVertexAttribPointer(program.GetLocation(VERTEX), sizeof(float) * 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)0);
+
+		glEnableVertexAttribArray(program.GetLocation(NORMAL));
+		glVertexAttribPointer(program.GetLocation(NORMAL),sizeof(float)*3,GL_FLOAT,GL_FALSE,sizeof(VertexData),(void*)(sizeof(float)*3));
+
+		glEnableVertexAttribArray(program.GetLocation(TEXCOORD));
+		glVertexAttribPointer(program.GetLocation(TEXCOORD), sizeof(float) * 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 5));
+
+		glBindBuffer(GL_ARRAY_BUFFER,0);
+	});
+
+	// create ibo
+	GLuint ibo = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*indexCount,GL_STATIC_DRAW,indices);
+
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ARRAY_BUFFER, ibo);
+	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
+	func();
+	glBindBuffer(GL_ARRAY_BUFFER,0);
+	glBindVertexArray(0);
+};
