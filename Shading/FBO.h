@@ -1,8 +1,8 @@
 #pragma once
 #include "glew.h"
 #include <map>
-#include <vector>
 #include <string>
+#include <vector>
 
 class FBO
 {

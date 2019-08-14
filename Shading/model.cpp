@@ -134,14 +134,15 @@ VertexData* LoadObjModel(const char* filePath, unsigned int** indices, int& inde
 	return nullptr;
 }
 
-void DrawModel( const char* filePath , GPUProgram program ,void* func() )   
+void DrawModel( const char* filePath , GPUProgram program ,GLuint&vao ,GLuint&ibo,int& indexCount)   
 {
 	unsigned int* indices = nullptr;
-	int indexCount, vertexCount;
-	VertexData* vertices = LoadObjModel(filePath, &indices, indexCount, vertexCount);
+	int indicesCount, vertexCount;
+	VertexData* vertices = LoadObjModel(filePath, &indices, indicesCount, vertexCount);
+	//indexCount = indicesCount;
 
 	// create vao
-	GLuint vao = CreateVAO([&](void)
+	/*GLuint*/ vao = CreateVAO([&](void)
 	{
 		GLuint vbo = CreateBufferObject(GL_ARRAY_BUFFER, sizeof(VertexData) * vertexCount, GL_STATIC_DRAW, vertices);
 		// bind vbo
@@ -161,12 +162,12 @@ void DrawModel( const char* filePath , GPUProgram program ,void* func() )
 	});
 
 	// create ibo
-	GLuint ibo = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*indexCount,GL_STATIC_DRAW,indices);
+	/*GLuint*/ ibo = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)* indicesCount,GL_STATIC_DRAW,indices);
 
-	glBindVertexArray(vao);
+	/*glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, ibo);
-	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
-	func();
+	glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, (void*)0);
+	void*func();
 	glBindBuffer(GL_ARRAY_BUFFER,0);
-	glBindVertexArray(0);
+	glBindVertexArray(0);*/
 };

@@ -155,10 +155,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	skyboxProgram.DetectUniform("U_EyePos");
 
 	GPUProgram cubemapReflection;
-	cubemapReflection.AttachShader(GL_VERTEX_SHADER, "res/shader/skybox/cubemap_reflection.vs");
-	cubemapReflection.AttachShader(GL_FRAGMENT_SHADER, "res/shader/skybox/cubemap_reflection.fs");
+	cubemapReflection.AttachShader(GL_VERTEX_SHADER, "res/shader/light.vs"); // cubemap_reflection
+	cubemapReflection.AttachShader(GL_FRAGMENT_SHADER, "res/shader/light.fs"); // cubemap_reflection
 	cubemapReflection.LinkProgram();
 	cubemapReflection.InitializeLocation();
+	cubemapReflection.DetectUniform("U_CameraPos");
+
+	GLuint sphereVAO;
+	GLuint sphereIBO;
+	int indicesCount;
+	DrawModel("res/model/Sphere.obj", cubemapReflection, sphereVAO, sphereIBO, indicesCount);
 
 	FullScreenQuad fullscreen;
 	fullscreen.Init(); 
@@ -176,7 +182,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	FBO fbo2;
 	fbo2.AttachColorBuffer("color", GL_COLOR_ATTACHMENT0, GL_RGBA, width, height);
 	fbo2.AttachDepthBuffer("depth", width, height);
-	fbo2.Finish(); 
+	fbo2.Finish();
 
 	FBO fbo3;
 	fbo3.AttachColorBuffer("color", GL_COLOR_ATTACHMENT0, GL_RGBA, width, height);
@@ -184,9 +190,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	fbo3.Finish();
 
 	FBO hdrFBO;
-	hdrFBO.AttachColorBuffer("color",GL_COLOR_ATTACHMENT0,GL_RGBA,width,height);
-	hdrFBO.AttachColorBuffer("hdrColor",GL_COLOR_ATTACHMENT1,GL_RGBA16F,width,height);
-	hdrFBO.AttachDepthBuffer("depth",width,height);
+	hdrFBO.AttachColorBuffer("color", GL_COLOR_ATTACHMENT0, GL_RGBA, width, height);
+	hdrFBO.AttachColorBuffer("hdrColor", GL_COLOR_ATTACHMENT1, GL_RGBA16F, width, height);
+	hdrFBO.AttachDepthBuffer("depth", width, height);
 	hdrFBO.Finish();
 
 	GLuint vao = CreateVAO([&]()
@@ -216,7 +222,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	UpdateWindow(hwnd); 
 
 	glm::mat4 MODEL0 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) *glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 MODEL1 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -9.0f)) * glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 MODEL1 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f)) * glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 MODEL2 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -15.0f)) * glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 PROJECTION = glm::perspective(45.0f, float(width) / (float)height, 0.1f, 200.0f);
 	glm::mat4 ORTHO = glm::ortho(-width/2.0f, width/2.0f, -height/2.0f, height/2.0f);
@@ -404,7 +410,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	{
 		glUseProgram(cubemapReflection.mProgram);
 
-		// draw cubeamp reflection.
+		glUniformMatrix4fv(cubemapReflection.GetLocation(M_MATRIX), 1, GL_FALSE, glm::value_ptr(MODEL1));
+		glUniformMatrix4fv(cubemapReflection.GetLocation(V_MATRIX), 1, GL_FALSE, glm::value_ptr(VIEW));
+		glUniformMatrix4fv(cubemapReflection.GetLocation(P_MATRIX), 1, GL_FALSE, glm::value_ptr(PROJECTION));
+		glUniformMatrix4fv(cubemapReflection.GetLocation(NM_MATRIX),1, GL_FALSE, glm::value_ptr(glm::inverseTranspose(MODEL1)));
+
+		glUniform3fv(cubemapReflection.GetLocation("U_CameraPos"),1, viewPos);
+
+		// draw cubemap reflection.
+		glBindVertexArray(sphereVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, sphereIBO);
+		glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, (void*)0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
 
 		glUseProgram(0);
 	};
@@ -428,7 +446,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glClearColor(0.1f, 0.4f, 0.7f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
-		renderSkybox();
+		//renderSkybox();
+
+		/*	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+			glClearColor(0.0f,0.0f,0.0f,0.0f);*/
+		glEnable(GL_DEPTH_TEST);
+		renderCubemapReflection();
 
 		//glDisable(GL_BLEND);
 		////glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

@@ -10,4 +10,4 @@ struct VertexData
 
 VertexData* LoadObjModel(const char* filePath, unsigned int** indices, int& indexCount, int& vertexCount);
 
-void DrawModel( const char* filePath, GPUProgram program,void* func()) ;
+void DrawModel(const char* filePath, GPUProgram program, GLuint& vao, GLuint& ibo,int& indexCount);
