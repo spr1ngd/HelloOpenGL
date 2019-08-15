@@ -139,7 +139,7 @@ void DrawModel( const char* filePath , GPUProgram program ,GLuint&vao ,GLuint&ib
 	unsigned int* indices = nullptr;
 	int indicesCount, vertexCount;
 	VertexData* vertices = LoadObjModel(filePath, &indices, indicesCount, vertexCount);
-	//indexCount = indicesCount;
+	indexCount = indicesCount;
 
 	// create vao
 	/*GLuint*/ vao = CreateVAO([&](void)

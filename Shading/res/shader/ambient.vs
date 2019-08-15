@@ -7,7 +7,10 @@ uniform mat4 V;
 uniform mat4 P;
 uniform mat4 NM;
 
+varying vec2 V_Texcoord;
+
 void main()
 { 
+    V_Texcoord = texcoord;
     gl_Position = P*V*M*vec4(vertex,1.0);
 }
