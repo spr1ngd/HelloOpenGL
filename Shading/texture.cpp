@@ -98,12 +98,12 @@ void Texture::UnLoadTexture(Texture*texture)
 unsigned int Texture::LoadSkyboxTextures(const char* texturePath)
 {
 	unsigned int cubemap = SOIL_load_OGL_cubemap(
-		"res/texture/skybox/Default/right.png", 
-		"res/texture/skybox/Default/left.png", 
-		"res/texture/skybox/Default/top.png", 
-		"res/texture/skybox/Default/bottom.png", 
-		"res/texture/skybox/Default/back.png",
-		"res/texture/skybox/Default/front.png", 
+		"res/texture/skybox/Origin/right.png", 
+		"res/texture/skybox/Origin/left.png", 
+		"res/texture/skybox/Origin/top.png", 
+		"res/texture/skybox/Origin/bottom.png", 
+		"res/texture/skybox/Origin/back.png",
+		"res/texture/skybox/Origin/front.png", 
 		0,0,SOIL_FLAG_POWER_OF_TWO);
 	return cubemap;
 }

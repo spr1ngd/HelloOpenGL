@@ -9,5 +9,5 @@ void main()
 {
     vec3 eyeDir = vec3(V_WorldPos.xyz - U_CameraPos);
     vec3 reflectorDir = reflect(V_Normal,eyeDir);
-    gl_FragColor = textureCube(U_Texture,V_Normal);
+    gl_FragColor = textureCube(U_MainTexture,V_Normal); 
 }
