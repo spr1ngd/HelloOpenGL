@@ -119,8 +119,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	//cube.LinkProgram();
 	//cube.InitializeLocation();
 	
-	GLuint cube = CreateGPUProgram("res/shader/skybox/cubemap_reflection.vs",
-		"res/shader/skybox/cubemap_reflection.fs");
+	GLuint cube = CreateGPUProgram(
+		/*"res/shader/skybox/cubemap_reflection.vs",
+		"res/shader/skybox/cubemap_reflection.fs");*/
+		"res/shader/skybox/refraction.vs",
+		"res/shader/skybox/refraction.fs");
 	GLuint cubeMLocation, cubeVLocation, cubePLocation, cubeNMLocation, cubevertexLocation, cubenormalLocation, cubetexcoordLocation, cubeMainTextureLocation, cubeSecondTextureLocation;
 	cubevertexLocation = glGetAttribLocation(cube, "vertex");
 	cubenormalLocation = glGetAttribLocation(cube, "normal");
@@ -200,7 +203,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	ShowWindow(hwnd, SW_SHOW);
 	UpdateWindow(hwnd); 
 
-	glm::mat4 MODEL0 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) *glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 MODEL0 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) *glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 MODEL1 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f))*glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 MODEL2 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -15.0f)) * glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 PROJECTION = glm::perspective(45.0f, float(width) / (float)height, 0.1f, 200.0f);
@@ -270,7 +273,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	// TODO: load model to vertices/indices/texcoord/normals data object.
 	// TODO: create VAO,VBO,I(E)BO 
 	// TODO: set shader attribute and uniform by location.
-	glm::mat4 cubeModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.5f)) * glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 cubeModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.5f)) * glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 cubeProject = glm::perspective(45.0f, float(width) / (float)height, 0.1f, 200.0f);
 	glm::mat4 cubeView = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 cubeNM = glm::inverseTranspose(cubeModel);
