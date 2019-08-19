@@ -78,7 +78,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	height = rect.bottom - rect.top;
 
 	// load textures
-	Texture* texture = Texture::LoadTexture("res/texture/flower.jpg");
+	Texture* texture = Texture::LoadTexture("res/texture/fur.jpg");
 	Texture* secondTex = Texture::LoadTexture("res/texture/earth.bmp");
 	unsigned int cubemap = Texture::LoadSkyboxTextures("res/texture/skybox/Origin/");
 
@@ -139,8 +139,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	// load cube model
 	unsigned int* indices = nullptr;
 	int indexCount, vertexCount;
-	VertexData* vertices = LoadObjModel("res/model/sphere.obj", &indices, indexCount, vertexCount);
+	VertexData* vertices = LoadObjModel("res/model/quad.obj", &indices, indexCount, vertexCount);
 	 
+	// load sphere model
 	unsigned int* cubeIndices = nullptr;
 	int cubeVertexCount, cubeIndexCount;
 	VertexData* cubeVertices = LoadObjModel("res/model/sphere.obj", &cubeIndices, cubeIndexCount, cubeVertexCount);
@@ -180,23 +181,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	});
 	GLuint IBO = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * cubeIndexCount, GL_STATIC_DRAW, cubeIndices);
-
-	GPUProgram fsProgram; 
-	fsProgram.AttachShader(GL_VERTEX_SHADER, "res/shader/fullscreen.vs");
-	fsProgram.AttachShader(GL_FRAGMENT_SHADER,"res/shader/fullscreen.fs");
-	fsProgram.LinkProgram();
-	fsProgram.InitializeLocation(); 
-
-	GPUProgram skyboxProgram;
-	skyboxProgram.AttachShader(GL_VERTEX_SHADER,"res/shader/skybox/skybox.vs");
-	skyboxProgram.AttachShader(GL_FRAGMENT_SHADER,"res/shader/skybox/skybox.fs");
-	skyboxProgram.LinkProgram();
-	skyboxProgram.InitializeLocation();
-	skyboxProgram.DetectUniform("U_EyePos"); 
-
-	FullScreenQuad fullscreen;
-	fullscreen.Init();  
-
+	 
 
 	glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 	glViewport(0, 0, width, height);
@@ -215,7 +200,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	float viewPos[] = {0.0f,0.0f,.0f};
 	// LIGHT SETTING
-	float lightPos[] = {2.0f,2.0f,3.0f,0.0f};
+	float lightPos[] = {2.0f,2.0f,-3.0f,0.0f};
 	float lightColor[] = {1.0f,1.0f ,1.0f,1.0f};
 	float lightDirection[] = {0.0f,-1.0f,0.0f,128.0f};
 	float lightIntensity = 3.0f;
@@ -228,7 +213,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	// DIFFUSE SETTING
 	float materialColor[] = {0.4f,0.4f,0.4f,1.0f};
-	float diffuseColor[] = {0.2f,0.8f,0.9f,1.0f};
+	float diffuseColor[] = {0.1f,0.4f,0.7f,1.0f};
 
 	// SPECULAR SETTING
 	float specularColor[] = { 0.75f,0.75f,0.75f,1.0f };
@@ -240,112 +225,111 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	float fogDensity = 0.1f;
 	float fogGradient = 2.0f; 
 
-	auto renderSkybox = [&](void) 
-	{ 
-		glDisable(GL_DEPTH_TEST);
+	//auto renderSkybox = [&](void) 
+	//{ 
+	//	glDisable(GL_DEPTH_TEST);
 
-		glUseProgram(skyboxProgram.mProgram);
+	//	glUseProgram(skyboxProgram.mProgram);
 
-		glUniformMatrix4fv(skyboxProgram.GetLocation("M"),1,GL_FALSE,glm::value_ptr(MODEL0));
-		glUniformMatrix4fv(skyboxProgram.GetLocation("V"),1,GL_FALSE,glm::value_ptr(VIEW));
-		glUniformMatrix4fv(skyboxProgram.GetLocation("P"),1,GL_FALSE,glm::value_ptr(PROJECTION));
+	//	glUniformMatrix4fv(skyboxProgram.GetLocation("M"),1,GL_FALSE,glm::value_ptr(MODEL0));
+	//	glUniformMatrix4fv(skyboxProgram.GetLocation("V"),1,GL_FALSE,glm::value_ptr(VIEW));
+	//	glUniformMatrix4fv(skyboxProgram.GetLocation("P"),1,GL_FALSE,glm::value_ptr(PROJECTION));
 
-		glUniform3fv(skyboxProgram.GetLocation("U_EyePos"),1, viewPos);
+	//	glUniform3fv(skyboxProgram.GetLocation("U_EyePos"),1, viewPos);
+
+	//	glBindVertexArray(vao);
+
+	//	//glActiveTexture(GL_TEXTURE0);
+	//	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap);
+	//	glUniform1i(skyboxProgram.GetLocation(MAIN_TEXTURE), 0);
+
+	//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	//	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
+	//	glBindVertexArray(0);
+
+	//	glUseProgram(0);
+	//}; 
+	 
+	GPUProgram receiver;
+	receiver.AttachShader(GL_VERTEX_SHADER,   "res/shader/light/direction_light.vs");
+	receiver.AttachShader(GL_FRAGMENT_SHADER, "res/shader/light/direction_light.fs");
+	receiver.LinkProgram();
+	receiver.InitializeLocation();
+
+	receiver.DetectUniform("U_AmbientColor");
+	receiver.DetectUniform("U_LightPos");
+	receiver.DetectUniform("U_LightColor");
+	receiver.DetectUniform("U_DiffuseColor");
+	receiver.DetectUniform("U_SpecularColor");
+
+	glm::mat4 receiverModel = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,-0.3f,-3.0f)) * 
+		glm::rotate(glm::mat4(1.0f) , 30.0f,glm::vec3(1.0f,0.0f,0.0f)) * 
+		glm::scale(glm::mat4(1.0f) , glm::vec3(2.5f));
+	glm::mat4 receiverView = glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 receiverProjection = glm::perspective(45.0f, (float)width / (float)height, 0.1f, 200.0f);
+	glm::mat4 receiverNM = glm::inverseTranspose(receiverModel);
+
+	auto renderShadowReceiver = [&](void) 
+	{
+		glUseProgram(receiver.mProgram);
+
+		glUniformMatrix4fv(receiver.GetLocation(M_MATRIX),1,GL_FALSE,glm::value_ptr(receiverModel));
+		glUniformMatrix4fv(receiver.GetLocation(V_MATRIX), 1, GL_FALSE, glm::value_ptr(receiverView));
+		glUniformMatrix4fv(receiver.GetLocation(P_MATRIX), 1, GL_FALSE, glm::value_ptr(receiverProjection));
+		//glUniformMatrix4fv(receiver.GetLocation(NM_MATRIX), 1, GL_FALSE, glm::value_ptr(receiverNM));
+
+		glUniform4fv(receiver.GetLocation("U_AmbientColor"), 1, ambientColor);
+		glUniform4fv(receiver.GetLocation("U_LightPos"), 1, lightPos);
+		glUniform4fv(receiver.GetLocation("U_LightColor"),1,lightColor);
+		glUniform4fv(receiver.GetLocation("U_DiffuseColor"),1,diffuseColor);
+		glUniform4fv(receiver.GetLocation("U_SpecularColor"), 1, specularColor);
 
 		glBindVertexArray(vao);
-
-		//glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap);
-		glUniform1i(skyboxProgram.GetLocation(MAIN_TEXTURE), 0);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ibo);
+		glDrawElements(GL_TRIANGLES, indexCount,GL_UNSIGNED_INT,(void*)0);
 		glBindVertexArray(0);
-
 		glUseProgram(0);
-	}; 
+	};
 
-	//glEnable(GL_CULL_FACE); 
-	//glEnable(GL_DEPTH_TEST); 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	GPUProgram caster;
+	caster.AttachShader(GL_VERTEX_SHADER, "res/shader/diffuse.vs");
+	caster.AttachShader(GL_FRAGMENT_SHADER, "res/shader/diffuse.fs");
+	caster.LinkProgram();
+	caster.InitializeLocation(); 
 
-	// TODO: create GPUProgram , initialize location get some common location, if you need custom uniform use DetecetAttribute/DetectUniform 	
-	// TODO: load model to vertices/indices/texcoord/normals data object.
-	// TODO: create VAO,VBO,I(E)BO 
-	// TODO: set shader attribute and uniform by location.
-	glm::mat4 cubeModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.5f)) * glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 cubeProject = glm::perspective(45.0f, float(width) / (float)height, 0.1f, 200.0f);
-	glm::mat4 cubeView = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 cubeNM = glm::inverseTranspose(cubeModel);
-	
-	auto render = [&](void)
+	glm::mat4 casterModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.5f, -3.0f)) *
+		glm::rotate(glm::mat4(1.0f), 30.0f, glm::vec3(1.0f, 0.0f, 0.0f)) *
+		glm::scale(glm::mat4(1.0f), glm::vec3(0.3f));
+	glm::mat4 casterView = glm::lookAt(glm::vec3(0.0f),glm::vec3(0.0f,0.0f,-3.0f),glm::vec3(0.0f,1.0f,0.0f));
+	glm::mat4 casterProjection = glm::perspective(45.0f, (float)width / (float)height, 0.1f, 200.0f);
+	glm::mat4 casterNM = glm::inverseTranspose(casterModel);
+
+	auto renderShadowCast = [&](void) 
 	{
-		glUseProgram(program);
-		glUniformMatrix4fv(MLocation, 1, GL_FALSE, glm::value_ptr(MODEL0));
-		glUniformMatrix4fv(VLocation, 1, GL_FALSE, glm::value_ptr(VIEW));
-		glUniformMatrix4fv(PLocation, 1, GL_FALSE, glm::value_ptr(PROJECTION));
-		glUniformMatrix4fv(NMLocation, 1, GL_FALSE, glm::value_ptr(NM));
+		glUseProgram(caster.mProgram);
 
-		/*glUniform4fv(ambientColorLocation,1,ambientColor);
-
-		glUniform3fv(viewPosLocation,1,viewPos);
-		glUniform4fv(lightPosLocation,1,lightPos);
-		glUniform4fv(lightColorLocation,1,lightColor);
-		glUniform4fv(lightDirectionLocation,1,lightDirection);
-		glUniform1f(spotLightCutoffLocation, spotLightCutoff);
-		glUniform1f(lightIntensityLocation, lightIntensity);
-
-		glUniform4fv(diffuseColorLocation,1,diffuseColor);
-		glUniform4fv(diffuseMaterialLocation,1,materialColor);
-
-		glUniform4fv(specularColorLocation,1,specularColor);
-		glUniform4fv(specularMaterialLocation,1,specularMaterialColor);
-
-		glUniform4fv(fogColorLocation,1,fogColor);
-		glUniform4fv(fogDistanceLocation,1,fogDistance);
-		glUniform1f(fogDensityLocation, fogDensity);
-		glUniform1f(fogGradientLocation,fogGradient);*/
-
-		// bind ibo
+		glUniformMatrix4fv(caster.GetLocation(M_MATRIX), 1, GL_FALSE, glm::value_ptr(casterModel));
+		glUniformMatrix4fv(caster.GetLocation(V_MATRIX), 1, GL_FALSE, glm::value_ptr(casterView));
+		glUniformMatrix4fv(caster.GetLocation(P_MATRIX), 1, GL_FALSE, glm::value_ptr(casterProjection));
+		//glUniformMatrix4fv(caster.GetLocation(NM_MATRIX), 1, GL_FALSE, glm::value_ptr(casterNM)); 
+		
 		glBindVertexArray(VAO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-		/*glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D,texture->mTextureID);
-		glUniform1i(MainTextureLocation,0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,IBO);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
+		glUniform1i(caster.GetLocation(MAIN_TEXTURE), 0);
 
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, secondTex->mTextureID);
-		glUniform1i(SecondTextureLocation,1);*/
-		glDrawElements(GL_TRIANGLES, cubeIndexCount, GL_UNSIGNED_INT, (void*)0);
+		glUniform1i(caster.GetLocation(SECOND_TEXTURE), 1);
+
+		glDrawElements(GL_TRIANGLES,cubeIndexCount,GL_UNSIGNED_INT,(void*)0);
 		glBindVertexArray(0);
+		glUseProgram(0); 
+	}; 
 
-		glUseProgram(0);
-		glFinish();
-	};
-
-	auto renderReflectionSphere = [&](void)
-	{
-		glEnable(GL_DEPTH_TEST);
-
-		glUseProgram(cube); 
-		glUniformMatrix4fv(cubeMLocation, 1, GL_FALSE, glm::value_ptr(cubeModel));
-		glUniformMatrix4fv(cubeVLocation, 1, GL_FALSE, glm::value_ptr(cubeView));
-		glUniformMatrix4fv(cubePLocation, 1, GL_FALSE, glm::value_ptr(cubeProject));
-		glUniformMatrix4fv(cubeNMLocation, 1, GL_FALSE, glm::value_ptr(cubeNM));
-
-		glUniform3fv(cubeCameraLocation,1, viewPos);
-		//glActiveTexture(GL_TEXTURE_CUBE_MAP);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap);
-		glUniform1i(cubeMainTextureLocation,0);
-
-		glBindVertexArray(VAO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-		glDrawElements(GL_TRIANGLES, cubeIndexCount, GL_UNSIGNED_INT, (void*)0);
-		glBindVertexArray(0);
-		glUseProgram(0);
-		glFinish();
-	};
-
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	while (true) 
 	{
 		if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE)) 
@@ -359,12 +343,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		}
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearColor(0.1f, 0.4f, 0.7f, 1.0f);
-		renderSkybox();
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f); 
 
-		/*	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);*/
-		renderReflectionSphere();
+		glEnable(GL_TEXTURE_2D);
+		// TODO: draw quad as shadow_receive
+		renderShadowReceiver();
+		// TODO: draw sphere as shadow_cast
+		renderShadowCast();
+		// TODO: draw origin screen in left top window.
+		// TODO: draw depth buffer in right top window.
 
 #pragma region ∑÷∆¡‰÷»æ
 
