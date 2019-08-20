@@ -66,7 +66,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	int pixelFormatID = ChoosePixelFormat(dc,&pfd);
 	SetPixelFormat(dc,pixelFormatID,&pfd);
-
 	HGLRC rc = wglCreateContext(dc);
 	wglMakeCurrent(dc,rc);
 	glewInit(); 
@@ -80,125 +79,52 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	// load textures
 	Texture* texture = Texture::LoadTexture("res/texture/fur.jpg");
 	Texture* secondTex = Texture::LoadTexture("res/texture/earth.bmp");
-	unsigned int cubemap = Texture::LoadSkyboxTextures("res/texture/skybox/Origin/");
-
-	// create GPU program
-	GLuint program = CreateGPUProgram("res/shader/vertex/vertexcolor.vs", 
-									  "res/shader/vertex/vertexcolor.fs");
-	GLuint MLocation, VLocation, PLocation,NMLocation, vertexLocation, normalLocation, texcoordLocation,MainTextureLocation,SecondTextureLocation;
-	vertexLocation = glGetAttribLocation(program, "vertex");
-	normalLocation = glGetAttribLocation(program, "normal");
-	texcoordLocation = glGetAttribLocation(program,"texcoord");
-	MLocation = glGetUniformLocation(program, "M");
-	VLocation = glGetUniformLocation(program, "V");
-	PLocation = glGetUniformLocation(program,"P");
-	NMLocation = glGetUniformLocation(program, "NM");
-	MainTextureLocation = glGetUniformLocation(program,"U_MainTexture");
-	SecondTextureLocation = glGetUniformLocation(program,"U_SecondTexture");
-
-	GLuint viewPosLocation = glGetUniformLocation(program,"U_ViewPos");
-	GLuint lightPosLocation = glGetUniformLocation(program, "U_LightPos");
-	GLuint lightColorLocation = glGetUniformLocation(program,"U_LightColor");
-	GLuint lightDirectionLocation = glGetUniformLocation(program,"U_LightDirection");
-	GLuint spotLightCutoffLocation = glGetUniformLocation(program,"U_SpotLightCutoff");
-	GLuint lightIntensityLocation = glGetUniformLocation(program,"U_LightIntensity");
-	GLuint diffuseColorLocation = glGetUniformLocation(program,"U_DiffuseColor");
-	GLuint diffuseMaterialLocation = glGetUniformLocation(program,"U_DiffuseMaterial");
-	GLuint specularColorLocation = glGetUniformLocation(program,"U_SpecularColor");
-	GLuint specularMaterialLocation = glGetUniformLocation(program,"U_SpecularMaterial");
-	GLuint ambientColorLocation = glGetUniformLocation(program,"U_AmbientColor");
-
-	GLuint fogColorLocation = glGetUniformLocation(program, "U_FogColor");
-	GLuint fogDistanceLocation = glGetUniformLocation(program,"U_FogDistance");
-	GLuint fogDensityLocation = glGetUniformLocation(program,"U_FogDensity");
-	GLuint fogGradientLocation = glGetUniformLocation(program,"U_FogGradient");
-
-	//GPUProgram cube;
-	//cube.AttachShader(GL_VERTEX_SHADER, "res/shader/vertex/vertexcolor.vs");
-	//cube.AttachShader(GL_FRAGMENT_SHADER, "res/shader/vertex/vertexcolor.fs");
-	//cube.LinkProgram();
-	//cube.InitializeLocation();
-	
-	GLuint cube = CreateGPUProgram(
-		/*"res/shader/skybox/cubemap_reflection.vs",
-		"res/shader/skybox/cubemap_reflection.fs");*/
-		"res/shader/skybox/refraction.vs",
-		"res/shader/skybox/refraction.fs");
-	GLuint cubeMLocation, cubeVLocation, cubePLocation, cubeNMLocation, cubevertexLocation, cubenormalLocation, cubetexcoordLocation, cubeMainTextureLocation, cubeSecondTextureLocation;
-	cubevertexLocation = glGetAttribLocation(cube, "vertex");
-	cubenormalLocation = glGetAttribLocation(cube, "normal");
-	cubetexcoordLocation = glGetAttribLocation(cube, "texcoord");
-	cubeMLocation = glGetUniformLocation(cube, "M");
-	cubeVLocation = glGetUniformLocation(cube, "V");
-	cubePLocation = glGetUniformLocation(cube, "P");
-	cubeNMLocation = glGetUniformLocation(cube, "NM");
-	cubeMainTextureLocation = glGetUniformLocation(cube, "U_MainTexture");
-	cubeSecondTextureLocation = glGetUniformLocation(cube, "U_SecondTexture");
-	GLuint cubeCameraLocation = glGetUniformLocation(cube, "U_CameraPos");
-
-	// load cube model
-	unsigned int* indices = nullptr;
-	int indexCount, vertexCount;
-	VertexData* vertices = LoadObjModel("res/model/quad.obj", &indices, indexCount, vertexCount);
-	 
-	// load sphere model
-	unsigned int* cubeIndices = nullptr;
-	int cubeVertexCount, cubeIndexCount;
-	VertexData* cubeVertices = LoadObjModel("res/model/sphere.obj", &cubeIndices, cubeIndexCount, cubeVertexCount);
-	
-	GLuint vao = CreateVAO([&]()
-	{
-		GLuint vbo = CreateBufferObject(GL_ARRAY_BUFFER, sizeof(VertexData) * vertexCount, GL_STATIC_DRAW, vertices);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-		glEnableVertexAttribArray(vertexLocation);
-		glVertexAttribPointer(vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)0);
-
-		glEnableVertexAttribArray(normalLocation);
-		glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 3));
-
-		glEnableVertexAttribArray(texcoordLocation);
-		glVertexAttribPointer(texcoordLocation,2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 6));
-
-		glBindBuffer(GL_ARRAY_BUFFER,0);
-	});
-	GLuint ibo = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER,sizeof(unsigned int)*indexCount,GL_STATIC_DRAW,indices); 
-
-	GLuint VAO = CreateVAO([&](void)
-	{
-		GLuint VBO = CreateBufferObject(GL_ARRAY_BUFFER, sizeof(VertexData) * cubeVertexCount, GL_STATIC_DRAW, cubeVertices);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);  
-
-		glEnableVertexAttribArray(cubevertexLocation);
-		glVertexAttribPointer(cubevertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)0);
-
-		glEnableVertexAttribArray(cubenormalLocation);
-		glVertexAttribPointer(cubenormalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 3));
-
-		glEnableVertexAttribArray(cubetexcoordLocation);
-		glVertexAttribPointer(cubetexcoordLocation, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 6));
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-	});
-	GLuint IBO = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * cubeIndexCount, GL_STATIC_DRAW, cubeIndices);
-	 
+	unsigned int cubemap = Texture::LoadSkyboxTextures("res/texture/skybox/Origin/"); 
 
 	glClearColor(41.0f / 255.0f, 71.0f / 255.0f, 121.0f / 255.0f, 1.0f);
 	glViewport(0, 0, width, height);
 	ShowWindow(hwnd, SW_SHOW);
-	UpdateWindow(hwnd); 
+	UpdateWindow(hwnd);   
 
-	glm::mat4 MODEL0 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) *glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 MODEL1 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f))*glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 MODEL2 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -15.0f)) * glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 PROJECTION = glm::perspective(45.0f, float(width) / (float)height, 0.1f, 200.0f);
-	glm::mat4 ORTHO = glm::ortho(-width/2.0f, width/2.0f, -height/2.0f, height/2.0f);
-	glm::mat4 NM = glm::inverseTranspose(MODEL0);
+	GPUProgram fsProgram;
+	fsProgram.AttachShader(GL_VERTEX_SHADER,"res/shader/fullscreen.vs");
+	fsProgram.AttachShader(GL_FRAGMENT_SHADER, "res/shader/fullscreen.fs");
+	fsProgram.LinkProgram();
+	fsProgram.InitializeLocation();
 
-	//glm::mat4 VIEW = glm::mat4(1.0);
-	glm::mat4 VIEW = glm::lookAt(glm::vec3(0.0f, 0.0f,0.0f), glm::vec3(0.0f,0.0f,-1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	GPUProgram depthRender;
+	depthRender.AttachShader(GL_VERTEX_SHADER,"res/shader/depth/depthrender.vs");
+	depthRender.AttachShader(GL_FRAGMENT_SHADER,"res/shader/depth/depthrender.fs");
+	depthRender.LinkProgram();
+	depthRender.InitializeLocation();
 
-	float viewPos[] = {0.0f,0.0f,.0f};
+	FullScreenQuad fullscreen;
+	fullscreen.Init();
+
+	FBO fboLT;
+	fboLT.AttachColorBuffer("color", GL_COLOR_ATTACHMENT0,GL_RGBA,width,height);
+	fboLT.AttachDepthBuffer("depth",width,height);
+	fboLT.Finish();
+
+	FBO fboRT;
+	fboRT.AttachColorBuffer("color", GL_COLOR_ATTACHMENT0, GL_RGBA, width, height);
+	fboRT.AttachDepthBuffer("depth", width, height);
+	fboRT.Finish();
+
+	FBO fboLB;
+	fboLB.AttachColorBuffer("color", GL_COLOR_ATTACHMENT0, GL_RGBA, width, height);
+	fboLB.AttachDepthBuffer("depth", width, height);
+	fboLB.Finish();
+
+	FBO fboRB;
+	fboRB.AttachColorBuffer("color", GL_COLOR_ATTACHMENT0, GL_RGBA, width, height);
+	fboRB.AttachDepthBuffer("depth", width, height);
+	fboRB.Finish();
+
+	float viewPos[] = {0.0f,0.0f,0.0f};
+	glm::vec3 cameraPos = glm::vec3(2.0f,2.0f,0.0f);
+	glm::vec3 cameraTarget = glm::vec3(0.0f,0.0f,-3.0f);
+	glm::vec3 cameraDirection = glm::vec3(0.0f,1.0f,0.0f);
 	// LIGHT SETTING
 	float lightPos[] = {2.0f,2.0f,-3.0f,0.0f};
 	float lightColor[] = {1.0f,1.0f ,1.0f,1.0f};
@@ -213,7 +139,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	// DIFFUSE SETTING
 	float materialColor[] = {0.4f,0.4f,0.4f,1.0f};
-	float diffuseColor[] = {0.1f,0.4f,0.7f,1.0f};
+	float diffuseColor[] = {0.6f,0.6f,0.6f,1.0f};
 
 	// SPECULAR SETTING
 	float specularColor[] = { 0.75f,0.75f,0.75f,1.0f };
@@ -223,32 +149,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	float fogColor[] = {0.6f,0.6f,0.6f,1.0f};
 	float fogDistance[] = {0.0f,30.0f,0.0f,0.0f};
 	float fogDensity = 0.1f;
-	float fogGradient = 2.0f; 
+	float fogGradient = 2.0f;  
 
-	//auto renderSkybox = [&](void) 
-	//{ 
-	//	glDisable(GL_DEPTH_TEST);
-
-	//	glUseProgram(skyboxProgram.mProgram);
-
-	//	glUniformMatrix4fv(skyboxProgram.GetLocation("M"),1,GL_FALSE,glm::value_ptr(MODEL0));
-	//	glUniformMatrix4fv(skyboxProgram.GetLocation("V"),1,GL_FALSE,glm::value_ptr(VIEW));
-	//	glUniformMatrix4fv(skyboxProgram.GetLocation("P"),1,GL_FALSE,glm::value_ptr(PROJECTION));
-
-	//	glUniform3fv(skyboxProgram.GetLocation("U_EyePos"),1, viewPos);
-
-	//	glBindVertexArray(vao);
-
-	//	//glActiveTexture(GL_TEXTURE0);
-	//	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap);
-	//	glUniform1i(skyboxProgram.GetLocation(MAIN_TEXTURE), 0);
-
-	//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	//	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)0);
-	//	glBindVertexArray(0);
-
-	//	glUseProgram(0);
-	//}; 
+#pragma region draw floors 
 	 
 	GPUProgram receiver;
 	receiver.AttachShader(GL_VERTEX_SHADER,   "res/shader/light/direction_light.vs");
@@ -262,17 +165,40 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	receiver.DetectUniform("U_DiffuseColor");
 	receiver.DetectUniform("U_SpecularColor");
 
+	// load cube model
+	unsigned int* indices = nullptr;
+	int indexCount, vertexCount;
+	VertexData* vertices = LoadObjModel("res/model/cube.obj", &indices, indexCount, vertexCount);
+
+	GLuint receiverVAO = CreateVAO([&]()
+		{
+			GLuint receiverVBO = CreateBufferObject(GL_ARRAY_BUFFER, sizeof(VertexData) * vertexCount, GL_STATIC_DRAW, vertices);
+			glBindBuffer(GL_ARRAY_BUFFER, receiverVBO);
+
+			glEnableVertexAttribArray(receiver.GetLocation(VERTEX));
+			glVertexAttribPointer(receiver.GetLocation(VERTEX), 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)0);
+
+			glEnableVertexAttribArray(receiver.GetLocation(NORMAL));
+			glVertexAttribPointer(receiver.GetLocation(NORMAL), 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 3));
+
+			glEnableVertexAttribArray(receiver.GetLocation(TEXCOORD));
+			glVertexAttribPointer(receiver.GetLocation(TEXCOORD), 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 6));
+
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		});
+	GLuint receiverIBO = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indexCount, GL_STATIC_DRAW, indices);
+
+
 	glm::mat4 receiverModel = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,-0.3f,-3.0f)) * 
-		glm::rotate(glm::mat4(1.0f) , 30.0f,glm::vec3(1.0f,0.0f,0.0f)) * 
-		glm::scale(glm::mat4(1.0f) , glm::vec3(2.5f));
-	glm::mat4 receiverView = glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//glm::rotate(glm::mat4(1.0f) , 30.0f,glm::vec3(1.0f,0.0f,0.0f)) * 
+		glm::scale(glm::mat4(1.0f) , glm::vec3(1.0f));
+	glm::mat4 receiverView = glm::lookAt(cameraPos, cameraTarget, cameraDirection);
 	glm::mat4 receiverProjection = glm::perspective(45.0f, (float)width / (float)height, 0.1f, 200.0f);
 	glm::mat4 receiverNM = glm::inverseTranspose(receiverModel);
 
 	auto renderShadowReceiver = [&](void) 
 	{
 		glUseProgram(receiver.mProgram);
-
 		glUniformMatrix4fv(receiver.GetLocation(M_MATRIX),1,GL_FALSE,glm::value_ptr(receiverModel));
 		glUniformMatrix4fv(receiver.GetLocation(V_MATRIX), 1, GL_FALSE, glm::value_ptr(receiverView));
 		glUniformMatrix4fv(receiver.GetLocation(P_MATRIX), 1, GL_FALSE, glm::value_ptr(receiverProjection));
@@ -281,26 +207,53 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUniform4fv(receiver.GetLocation("U_AmbientColor"), 1, ambientColor);
 		glUniform4fv(receiver.GetLocation("U_LightPos"), 1, lightPos);
 		glUniform4fv(receiver.GetLocation("U_LightColor"),1,lightColor);
-		glUniform4fv(receiver.GetLocation("U_DiffuseColor"),1,diffuseColor);
+		glUniform4fv(receiver.GetLocation("U_DiffuseColor"),1,diffuseColor);	
 		glUniform4fv(receiver.GetLocation("U_SpecularColor"), 1, specularColor);
 
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ibo);
+		glBindVertexArray(receiverVAO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,receiverIBO);
 		glDrawElements(GL_TRIANGLES, indexCount,GL_UNSIGNED_INT,(void*)0);
 		glBindVertexArray(0);
 		glUseProgram(0);
 	};
 
+#pragma endregion
+
+#pragma region draw shadow caster
+
 	GPUProgram caster;
-	caster.AttachShader(GL_VERTEX_SHADER, "res/shader/diffuse.vs");
-	caster.AttachShader(GL_FRAGMENT_SHADER, "res/shader/diffuse.fs");
+	caster.AttachShader(GL_VERTEX_SHADER, "res/shader/unlit/unlitcolor.vs");
+	caster.AttachShader(GL_FRAGMENT_SHADER, "res/shader/unlit/unlitcolor.fs");
 	caster.LinkProgram();
 	caster.InitializeLocation(); 
 
+	// load sphere model
+	unsigned int* cubeIndices = nullptr;
+	int cubeVertexCount, cubeIndexCount;
+	VertexData* cubeVertices = LoadObjModel("res/model/sphere.obj", &cubeIndices, cubeIndexCount, cubeVertexCount);
+
+	GLuint casterVAO = CreateVAO([&]()
+	{
+		GLuint casterVBO = CreateBufferObject(GL_ARRAY_BUFFER, sizeof(VertexData) * cubeVertexCount, GL_STATIC_DRAW, cubeVertices);
+		glBindBuffer(GL_ARRAY_BUFFER, casterVBO);
+
+		glEnableVertexAttribArray(caster.GetLocation(VERTEX));
+		glVertexAttribPointer(caster.GetLocation(VERTEX), 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)0);
+
+		glEnableVertexAttribArray(caster.GetLocation(NORMAL));
+		glVertexAttribPointer(caster.GetLocation(NORMAL), 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 3));
+
+		glEnableVertexAttribArray(caster.GetLocation(TEXCOORD));
+		glVertexAttribPointer(caster.GetLocation(TEXCOORD), 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(sizeof(float) * 6));
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	});
+	GLuint casterIBO = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * cubeIndexCount, GL_STATIC_DRAW, cubeIndices);
+
 	glm::mat4 casterModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.5f, -3.0f)) *
-		glm::rotate(glm::mat4(1.0f), 30.0f, glm::vec3(1.0f, 0.0f, 0.0f)) *
-		glm::scale(glm::mat4(1.0f), glm::vec3(0.3f));
-	glm::mat4 casterView = glm::lookAt(glm::vec3(0.0f),glm::vec3(0.0f,0.0f,-3.0f),glm::vec3(0.0f,1.0f,0.0f));
+		//glm::rotate(glm::mat4(1.0f), 30.0f, glm::vec3(1.0f, 0.0f, 0.0f)) *
+		glm::scale(glm::mat4(1.0f), glm::vec3(0.15f));
+	glm::mat4 casterView = glm::lookAt(cameraPos,cameraTarget,cameraDirection);
 	glm::mat4 casterProjection = glm::perspective(45.0f, (float)width / (float)height, 0.1f, 200.0f);
 	glm::mat4 casterNM = glm::inverseTranspose(casterModel);
 
@@ -313,8 +266,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUniformMatrix4fv(caster.GetLocation(P_MATRIX), 1, GL_FALSE, glm::value_ptr(casterProjection));
 		//glUniformMatrix4fv(caster.GetLocation(NM_MATRIX), 1, GL_FALSE, glm::value_ptr(casterNM)); 
 		
-		glBindVertexArray(VAO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,IBO);
+		glBindVertexArray(casterVAO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, casterIBO);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture->mTextureID);
@@ -328,6 +281,65 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glBindVertexArray(0);
 		glUseProgram(0); 
 	}; 
+
+#pragma endregion 
+
+#pragma region multi render
+
+	auto render2LT = [&](void) 
+	{
+		fboLT.Bind();
+		renderShadowReceiver();
+		renderShadowCast();
+		fboLT.Unbind();
+
+		glUseProgram(fsProgram.mProgram);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, fboLT.GetBuffer("color"));
+		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
+		fullscreen.Draw(fsProgram.GetLocation(VERTEX), fsProgram.GetLocation(TEXCOORD), new Rect(-1.0f, 0.0f, 1.0f, 0.0f));
+		glUseProgram(0);
+	};
+
+	auto render2RT = [&](void) 
+	{
+		cameraPos = glm::vec3(0.0f, -5.0f, -3.0f);
+		cameraTarget = glm::vec3(0.0f);
+		receiverView = glm::lookAt(cameraPos, cameraTarget, cameraDirection);
+		casterView = glm::lookAt(cameraPos, cameraTarget, cameraDirection);
+
+		fboRT.Bind();
+		renderShadowReceiver();
+		renderShadowCast();
+		fboRT.Unbind();
+
+		glUseProgram(fsProgram.mProgram);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, fboRT.GetBuffer("color"));
+		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
+		fullscreen.Draw(fsProgram.GetLocation(VERTEX), fsProgram.GetLocation(TEXCOORD), new Rect(0.0f, 1.0f, 1.0f, 0.0f));
+		glUseProgram(0);
+
+		cameraPos = glm::vec3(0.0f);
+		cameraTarget = glm::vec3(0.0f,0.0f,-3.0f);
+		receiverView = glm::lookAt(cameraPos, cameraTarget, cameraDirection);
+		casterView = glm::lookAt(cameraPos, cameraTarget, cameraDirection);
+	};
+
+	auto render2LB = [&](void) 
+	{
+
+	};
+
+	auto render2RB = [&](void) 
+	{
+
+	};
+
+#pragma endregion
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FLOAT);
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	while (true) 
@@ -343,7 +355,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		}
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f); 
+		glClearColor(0.01f, 0.01f, 0.01f, 1.0f); 
 
 		glEnable(GL_TEXTURE_2D);
 		// TODO: draw quad as shadow_receive
@@ -355,17 +367,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 #pragma region ∑÷∆¡‰÷»æ
 
-		//// top left
-		//renderTopLeft();
+		// Render To Left Top
+		//render2LT();
 
-		//// top right
-		//renderTopRight();
-
-		//// bottom left
-		//renderBottomLeft();
-
-		//// bottom right
-		//renderBottomRight();
+		// Render To Right Top 
+		// draw the sphere's shadow received by quad.
+		//render2RT();
 
 #pragma endregion
 
