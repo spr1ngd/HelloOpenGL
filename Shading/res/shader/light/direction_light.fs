@@ -22,15 +22,15 @@ void main()
         
     }
     // Normal Direction In world Pos
-    vec3 N = normalize(V_Normal); 
+    vec3 N = -normalize(V_Normal); 
 
     float diffuseIntensity = max(0.0,dot(L,N));
-    vec4 diffuseColor = U_LightColor * U_DiffuseColor * 1.0;
+    vec4 diffuseColor = U_LightColor * U_DiffuseColor * diffuseIntensity;
 
     // specular color
     vec3 reflectDir = normalize(reflect(-L,N));
     vec3 viewDir = normalize(U_LightPos.xyz-V_WorldPos.xyz);
     vec4 reflectColor = U_SpecularColor * pow(max(0.0,dot(reflectDir,viewDir)),32);
 
-    gl_FragColor = U_AmbientColor + diffuseColor + reflectColor; 
+    gl_FragColor = U_AmbientColor + diffuseColor ;//+ reflectColor; 
 }

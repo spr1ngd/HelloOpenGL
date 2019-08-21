@@ -93,7 +93,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	fsProgram.InitializeLocation();
 
 	GPUProgram depthRender;
-	depthRender.AttachShader(GL_VERTEX_SHADER,"res/shader/depth/depthrender.vs");
+	depthRender.AttachShader(GL_VERTEX_SHADER,"res/shader/fullscreen.vs");
 	depthRender.AttachShader(GL_FRAGMENT_SHADER,"res/shader/depth/depthrender.fs");
 	depthRender.LinkProgram();
 	depthRender.InitializeLocation();
@@ -120,13 +120,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	fboRB.AttachColorBuffer("color", GL_COLOR_ATTACHMENT0, GL_RGBA, width, height);
 	fboRB.AttachDepthBuffer("depth", width, height);
 	fboRB.Finish();
-
-	float viewPos[] = {0.0f,0.0f,0.0f};
-	glm::vec3 cameraPos = glm::vec3(2.0f,2.0f,0.0f);
+	 
+	//glm::vec3 cameraPos = glm::vec3(2.0f,2.0f,0.0f);
+	glm::vec3 cameraPos = glm::vec3(3.0f,3.0f,0.0f);
 	glm::vec3 cameraTarget = glm::vec3(0.0f,0.0f,-3.0f);
 	glm::vec3 cameraDirection = glm::vec3(0.0f,1.0f,0.0f);
 	// LIGHT SETTING
-	float lightPos[] = {2.0f,2.0f,-3.0f,0.0f};
+	float lightPos[] = {3.0f,3.0f,-3.0f,0.0f};
 	float lightColor[] = {1.0f,1.0f ,1.0f,1.0f};
 	float lightDirection[] = {0.0f,-1.0f,0.0f,128.0f};
 	float lightIntensity = 3.0f;
@@ -139,7 +139,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	// DIFFUSE SETTING
 	float materialColor[] = {0.4f,0.4f,0.4f,1.0f};
-	float diffuseColor[] = {0.6f,0.6f,0.6f,1.0f};
+	float diffuseColor[] = {0.9f,0.9f,0.9f,1.0f};
 
 	// SPECULAR SETTING
 	float specularColor[] = { 0.75f,0.75f,0.75f,1.0f };
@@ -189,20 +189,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	GLuint receiverIBO = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indexCount, GL_STATIC_DRAW, indices);
 
 
-	glm::mat4 receiverModel = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,-0.3f,-3.0f)) * 
-		//glm::rotate(glm::mat4(1.0f) , 30.0f,glm::vec3(1.0f,0.0f,0.0f)) * 
+	glm::mat4 receiverModel = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,0.0f,-3.0f)) * 
+		//glm::rotate(glm::mat4(1.0f) , 30.0f,glm::vec3(0.0f,1.0f,0.0f)) * 
 		glm::scale(glm::mat4(1.0f) , glm::vec3(1.0f));
 	glm::mat4 receiverView = glm::lookAt(cameraPos, cameraTarget, cameraDirection);
 	glm::mat4 receiverProjection = glm::perspective(45.0f, (float)width / (float)height, 0.1f, 200.0f);
 	glm::mat4 receiverNM = glm::inverseTranspose(receiverModel);
 
+	float receiverRotateSpeed = 3.0f;
+	float receiverRotate = 0.0f;
+
 	auto renderShadowReceiver = [&](void) 
 	{
-		glUseProgram(receiver.mProgram);
+		glUseProgram(receiver.mProgram); 
 		glUniformMatrix4fv(receiver.GetLocation(M_MATRIX),1,GL_FALSE,glm::value_ptr(receiverModel));
 		glUniformMatrix4fv(receiver.GetLocation(V_MATRIX), 1, GL_FALSE, glm::value_ptr(receiverView));
-		glUniformMatrix4fv(receiver.GetLocation(P_MATRIX), 1, GL_FALSE, glm::value_ptr(receiverProjection));
-		//glUniformMatrix4fv(receiver.GetLocation(NM_MATRIX), 1, GL_FALSE, glm::value_ptr(receiverNM));
+		glUniformMatrix4fv(receiver.GetLocation(P_MATRIX), 1, GL_FALSE, glm::value_ptr(receiverProjection)); 
 
 		glUniform4fv(receiver.GetLocation("U_AmbientColor"), 1, ambientColor);
 		glUniform4fv(receiver.GetLocation("U_LightPos"), 1, lightPos);
@@ -250,7 +252,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 	});
 	GLuint casterIBO = CreateBufferObject(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * cubeIndexCount, GL_STATIC_DRAW, cubeIndices);
 
-	glm::mat4 casterModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.5f, -3.0f)) *
+	glm::mat4 casterModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.75f, -3.0f)) *
 		//glm::rotate(glm::mat4(1.0f), 30.0f, glm::vec3(1.0f, 0.0f, 0.0f)) *
 		glm::scale(glm::mat4(1.0f), glm::vec3(0.15f));
 	glm::mat4 casterView = glm::lookAt(cameraPos,cameraTarget,cameraDirection);
@@ -288,6 +290,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	auto render2LT = [&](void) 
 	{
+		glDisable(GL_DEPTH_TEST);
 		fboLT.Bind();
 		renderShadowReceiver();
 		renderShadowCast();
@@ -299,31 +302,36 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
 		fullscreen.Draw(fsProgram.GetLocation(VERTEX), fsProgram.GetLocation(TEXCOORD), new Rect(-1.0f, 0.0f, 1.0f, 0.0f));
 		glUseProgram(0);
+		glEnable(GL_DEPTH_TEST);
 	};
 
 	auto render2RT = [&](void) 
 	{
-		cameraPos = glm::vec3(0.0f, -5.0f, -3.0f);
-		cameraTarget = glm::vec3(0.0f);
+		cameraPos = glm::vec3(0.0f, 3.0f, -3.0f);
+		cameraTarget = glm::vec3(0.0f, 0.0f, -3.0f);
+		cameraDirection = glm::vec3(0.0f, 0.0f, 1.0f);
 		receiverView = glm::lookAt(cameraPos, cameraTarget, cameraDirection);
 		casterView = glm::lookAt(cameraPos, cameraTarget, cameraDirection);
-
+		glDisable(GL_DEPTH_TEST);
 		fboRT.Bind();
 		renderShadowReceiver();
 		renderShadowCast();
-		fboRT.Unbind();
+		fboRT.Unbind(); 
 
-		glUseProgram(fsProgram.mProgram);
+		glUseProgram(depthRender.mProgram);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, fboRT.GetBuffer("color"));
-		glUniform1i(fsProgram.GetLocation(MAIN_TEXTURE), 0);
-		fullscreen.Draw(fsProgram.GetLocation(VERTEX), fsProgram.GetLocation(TEXCOORD), new Rect(0.0f, 1.0f, 1.0f, 0.0f));
+		GLuint depthBuffer = fboRT.GetBuffer("depth");
+		glBindTexture(GL_TEXTURE_2D,depthBuffer);
+		glUniform1i(depthRender.GetLocation(MAIN_TEXTURE), 0);
+		fullscreen.Draw(depthRender.GetLocation(VERTEX), depthRender.GetLocation(TEXCOORD), new Rect(0.0f, 1.0f, 1.0f, 0.0f));
 		glUseProgram(0);
-
-		cameraPos = glm::vec3(0.0f);
-		cameraTarget = glm::vec3(0.0f,0.0f,-3.0f);
+		glEnable(GL_DEPTH_TEST);
+		cameraPos = glm::vec3(3.0f, 3.0f, 0.0f);
+		cameraTarget = glm::vec3(0.0f, 0.0f, -3.0f);
+		cameraDirection = glm::vec3(0.0f, 1.0f, 0.0f);
 		receiverView = glm::lookAt(cameraPos, cameraTarget, cameraDirection);
 		casterView = glm::lookAt(cameraPos, cameraTarget, cameraDirection);
+
 	};
 
 	auto render2LB = [&](void) 
@@ -340,6 +348,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FLOAT);
+	glEnable(GL_DEPTH_TEST);
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	while (true) 
@@ -354,13 +363,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 			DispatchMessage(&msg);
 		}
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearColor(0.01f, 0.01f, 0.01f, 1.0f); 
+		//receiverRotate += receiverRotateSpeed;
+		//if (receiverRotate > 400.0f)
+		//	receiverRotate -= 360.0f;
 
-		glEnable(GL_TEXTURE_2D);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearColor(0.01f, 0.01f, 0.01f, 1.0f);   
+		 
 		// TODO: draw quad as shadow_receive
 		renderShadowReceiver();
-		// TODO: draw sphere as shadow_cast
+		// TODO: draw sphere as shadow_cast 
 		renderShadowCast();
 		// TODO: draw origin screen in left top window.
 		// TODO: draw depth buffer in right top window.
@@ -368,11 +380,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,
 #pragma region ∑÷∆¡‰÷»æ
 
 		// Render To Left Top
-		//render2LT();
+		render2LT();
 
 		// Render To Right Top 
 		// draw the sphere's shadow received by quad.
-		//render2RT();
+		render2RT();
 
 #pragma endregion
 
