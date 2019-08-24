@@ -32,27 +32,24 @@ void FBO::AttachColorBuffer(const char* bufferName, GLenum attachment, GLenum da
 }
 
 void FBO::AttachDepthBuffer(const char* bufferName, int width, int height)
-{ 
-	GLuint depthMapFBO;
-	glGenFramebuffers(1, &depthMapFBO); 
-
+{
 	GLuint depthMap;
+	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 	glGenTextures(1, &depthMap);
 	glBindTexture(GL_TEXTURE_2D, depthMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-		width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glBindTexture(GL_TEXTURE_2D, 0);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	mBuffer.insert(std::pair<std::string, GLuint>(bufferName, depthMap));
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		printf("depth buffer error\n");
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void FBO::Finish() 
@@ -63,9 +60,7 @@ void FBO::Finish()
 		GLenum* buffers = new GLenum[nCount];
 		int i = 0;
 		while (i<nCount)
-		{
-			/*buffers[i++] = mDrawBuffers.top();
-			mDrawBuffers.pop();*/
+		{ 
 			buffers[i++] = mDrawBuffers[i];
 		}
 		glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
