@@ -4,9 +4,11 @@
 #include "glew.h"
 #include "wglew.h"
 #include <gl/GL.h>
+#include "app.h"
 
 #pragma comment (lib,"glew32.lib")
 #pragma comment (lib,"opengl32.lib")
+
 
 LRESULT CALLBACK GLWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -40,7 +42,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	rect.right = (long)800.0;
 	rect.top = (long)0.0;
 	rect.bottom = (long)600.0;
-	AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
+	// AdjustWinwRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
 
 	HWND hwnd = CreateWindowEx(NULL, "OpenGL", "RenderWindow", WS_OVERLAPPEDWINDOW, 100, 100, rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, hInstance, NULL);
 
@@ -71,6 +73,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	glViewport(0, 0, width, height);
 	ShowWindow(hwnd, SW_SHOW);
 	UpdateWindow(hwnd);
+	 
+	spring::App app;
+	app.Initialize();
 
 	while (true)
 	{
@@ -83,6 +88,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		} 
+		app.Render();
 		glFinish();
 		SwapBuffers(dc);
 	}
