@@ -79,6 +79,11 @@
     <ReferencePath>D:\Project Files\Unity Projects\springdong\HelloOpenGL\_OpenglPractice\libs;$(ReferencePath)</ReferencePath>
     <LibraryPath>D:\Project Files\Unity Projects\springdong\HelloOpenGL\_OpenglPractice\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>D:\uinnova\Engine\github\HelloOpenGL\_OpenglPractice\libs;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\uinnova\Engine\github\HelloOpenGL\_OpenglPractice\libs;$(LibraryPath)</LibraryPath>
+    <ReferencePath>D:\uinnova\Engine\github\HelloOpenGL\_OpenglPractice\libs;$(ReferencePath)</ReferencePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -132,15 +137,18 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>D:\uinnova\Engine\github\HelloOpenGL\_OpenglPractice\libs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>glew32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="GPUProgram.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Node.cpp" />
@@ -148,6 +156,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
+    <ClInclude Include="GPUProgram.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Node.h" />

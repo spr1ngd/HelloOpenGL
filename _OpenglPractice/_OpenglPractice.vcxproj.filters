@@ -16,6 +16,12 @@
     <Filter Include="源文件\Core">
       <UniqueIdentifier>{36f666ed-2d8c-4d97-b120-ac55d2c75df1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\Utils">
+      <UniqueIdentifier>{464b9945-5b41-4c50-adfd-31a67431f5ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\App">
+      <UniqueIdentifier>{be02a6e4-93d6-4a7f-bbff-6edc832cf43d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -30,8 +36,11 @@
     <ClCompile Include="Model.cpp">
       <Filter>源文件\Core</Filter>
     </ClCompile>
+    <ClCompile Include="GPUProgram.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
     <ClCompile Include="App.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\App</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -48,6 +57,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="App.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GPUProgram.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,8 +1,8 @@
 
 #include <windows.h>
 #include <stdio.h> 
-#include "glew.h"
-#include "wglew.h"
+//#include "glew.h"
+//#include "wglew.h"
 #include <gl/GL.h>
 #include "app.h"
 
@@ -61,7 +61,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	SetPixelFormat(dc, pixelFormatID, &pfd);
 	HGLRC rc = wglCreateContext(dc);
 	wglMakeCurrent(dc, rc);
-	glewInit();
+	//glewInit();
 	MSG msg;
 
 	int width, height;
